@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -12,16 +12,17 @@
  */
 package io.reactivex.internal.operators.flowable;
 
-import io.reactivex.plugins.RxJavaPlugins;
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Predicate;
 import io.reactivex.internal.subscriptions.*;
+import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableAny<T> extends AbstractFlowableWithUpstream<T, Boolean> {
     final Predicate<? super T> predicate;
-    public FlowableAny(Publisher<T> source, Predicate<? super T> predicate) {
+    public FlowableAny(Flowable<T> source, Predicate<? super T> predicate) {
         super(source);
         this.predicate = predicate;
     }
@@ -31,7 +32,7 @@ public final class FlowableAny<T> extends AbstractFlowableWithUpstream<T, Boolea
         source.subscribe(new AnySubscriber<T>(s, predicate));
     }
 
-    static final class AnySubscriber<T> extends DeferredScalarSubscription<Boolean> implements Subscriber<T> {
+    static final class AnySubscriber<T> extends DeferredScalarSubscription<Boolean> implements FlowableSubscriber<T> {
 
         private static final long serialVersionUID = -2311252482644620661L;
 

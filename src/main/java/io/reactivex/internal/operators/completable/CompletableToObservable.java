@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -16,6 +16,11 @@ package io.reactivex.internal.operators.completable;
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 
+/**
+ * Wraps a Completable and exposes it as an Observable.
+ *
+ * @param <T> the value type
+ */
 public final class CompletableToObservable<T> extends Observable<T> {
 
     final CompletableSource source;

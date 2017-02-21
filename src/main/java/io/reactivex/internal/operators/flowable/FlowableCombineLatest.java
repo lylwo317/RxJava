@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -18,10 +18,12 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
-import io.reactivex.Flowable;
+import io.reactivex.*;
+import io.reactivex.annotations.*;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.ObjectHelper;
+import io.reactivex.internal.operators.flowable.FlowableMap.MapSubscriber;
 import io.reactivex.internal.queue.SpscLinkedArrayQueue;
 import io.reactivex.internal.subscriptions.*;
 import io.reactivex.internal.util.*;
@@ -36,8 +38,10 @@ import io.reactivex.plugins.RxJavaPlugins;
 public final class FlowableCombineLatest<T, R>
 extends Flowable<R> {
 
+    @Nullable
     final Publisher<? extends T>[] array;
 
+    @Nullable
     final Iterable<? extends Publisher<? extends T>> iterable;
 
     final Function<? super Object[], ? extends R> combiner;
@@ -46,8 +50,8 @@ extends Flowable<R> {
 
     final boolean delayErrors;
 
-    public FlowableCombineLatest(Publisher<? extends T>[] array,
-            Function<? super Object[], ? extends R> combiner,
+    public FlowableCombineLatest(@NonNull Publisher<? extends T>[] array,
+                    @NonNull Function<? super Object[], ? extends R> combiner,
                     int bufferSize, boolean delayErrors) {
         this.array = array;
         this.iterable = null;
@@ -56,8 +60,8 @@ extends Flowable<R> {
         this.delayErrors = delayErrors;
     }
 
-    public FlowableCombineLatest(Iterable<? extends Publisher<? extends T>> iterable,
-            Function<? super Object[], ? extends R> combiner,
+    public FlowableCombineLatest(@NonNull Iterable<? extends Publisher<? extends T>> iterable,
+                    @NonNull Function<? super Object[], ? extends R> combiner,
                     int bufferSize, boolean delayErrors) {
         this.array = null;
         this.iterable = iterable;
@@ -128,12 +132,12 @@ extends Flowable<R> {
             return;
         }
         if (n == 1) {
-            new FlowableMap<T, R>((Publisher<T>)a[0], new Function<T, R>() {
+            ((Publisher<T>)a[0]).subscribe(new MapSubscriber<T, R>(s, new Function<T, R>() {
                 @Override
                 public R apply(T t) throws Exception {
                     return combiner.apply(new Object[] { t });
                 }
-            }).subscribe(s);
+            }));
             return;
         }
 
@@ -420,6 +424,7 @@ extends Flowable<R> {
             if (d) {
                 if (delayErrors) {
                     if (empty) {
+                        cancelAll();
                         Throwable e = ExceptionHelper.terminate(error);
 
                         if (e != null && e != ExceptionHelper.TERMINATED) {
@@ -465,6 +470,7 @@ extends Flowable<R> {
             return m;
         }
 
+        @Nullable
         @SuppressWarnings("unchecked")
         @Override
         public R poll() throws Exception {
@@ -491,7 +497,7 @@ extends Flowable<R> {
 
     static final class CombineLatestInnerSubscriber<T>
     extends AtomicReference<Subscription>
-            implements Subscriber<T> {
+            implements FlowableSubscriber<T> {
 
 
         private static final long serialVersionUID = -8730235182291002949L;

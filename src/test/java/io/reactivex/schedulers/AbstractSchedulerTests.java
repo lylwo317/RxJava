@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -40,6 +40,7 @@ public abstract class AbstractSchedulerTests {
 
     /**
      * The scheduler to test.
+     * @return the Scheduler instance
      */
     protected abstract Scheduler getScheduler();
 
@@ -136,7 +137,7 @@ public abstract class AbstractSchedulerTests {
     /**
      * The order of execution is nondeterministic.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException if the await is interrupted
      */
     @SuppressWarnings("rawtypes")
     @Test

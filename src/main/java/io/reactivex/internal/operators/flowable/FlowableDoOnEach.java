@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,8 +13,10 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscriber;
 
+import io.reactivex.Flowable;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.*;
 import io.reactivex.internal.fuseable.ConditionalSubscriber;
@@ -27,7 +29,7 @@ public final class FlowableDoOnEach<T> extends AbstractFlowableWithUpstream<T, T
     final Action onComplete;
     final Action onAfterTerminate;
 
-    public FlowableDoOnEach(Publisher<T> source, Consumer<? super T> onNext,
+    public FlowableDoOnEach(Flowable<T> source, Consumer<? super T> onNext,
             Consumer<? super Throwable> onError,
             Action onComplete,
             Action onAfterTerminate) {
@@ -144,6 +146,7 @@ public final class FlowableDoOnEach<T> extends AbstractFlowableWithUpstream<T, T
             return transitiveBoundaryFusion(mode);
         }
 
+        @Nullable
         @Override
         public T poll() throws Exception {
             T v = qs.poll();
@@ -276,6 +279,7 @@ public final class FlowableDoOnEach<T> extends AbstractFlowableWithUpstream<T, T
             return transitiveBoundaryFusion(mode);
         }
 
+        @Nullable
         @Override
         public T poll() throws Exception {
             T v = qs.poll();

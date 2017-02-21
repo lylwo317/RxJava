@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -958,4 +958,87 @@ public class ObservableConcatTest {
 
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void noSubsequentSubscription() {
+        final int[] calls = { 0 };
+
+        Observable<Integer> source = Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(ObservableEmitter<Integer> s) throws Exception {
+                calls[0]++;
+                s.onNext(1);
+                s.onComplete();
+            }
+        });
+
+        Observable.concatArray(source, source).firstElement()
+        .test()
+        .assertResult(1);
+
+        assertEquals(1, calls[0]);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void noSubsequentSubscriptionDelayError() {
+        final int[] calls = { 0 };
+
+        Observable<Integer> source = Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(ObservableEmitter<Integer> s) throws Exception {
+                calls[0]++;
+                s.onNext(1);
+                s.onComplete();
+            }
+        });
+
+        Observable.concatArrayDelayError(source, source).firstElement()
+        .test()
+        .assertResult(1);
+
+        assertEquals(1, calls[0]);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void noSubsequentSubscriptionIterable() {
+        final int[] calls = { 0 };
+
+        Observable<Integer> source = Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(ObservableEmitter<Integer> s) throws Exception {
+                calls[0]++;
+                s.onNext(1);
+                s.onComplete();
+            }
+        });
+
+        Observable.concat(Arrays.asList(source, source)).firstElement()
+        .test()
+        .assertResult(1);
+
+        assertEquals(1, calls[0]);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void noSubsequentSubscriptionDelayErrorIterable() {
+        final int[] calls = { 0 };
+
+        Observable<Integer> source = Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(ObservableEmitter<Integer> s) throws Exception {
+                calls[0]++;
+                s.onNext(1);
+                s.onComplete();
+            }
+        });
+
+        Observable.concatDelayError(Arrays.asList(source, source)).firstElement()
+        .test()
+        .assertResult(1);
+
+        assertEquals(1, calls[0]);
+    }
 }

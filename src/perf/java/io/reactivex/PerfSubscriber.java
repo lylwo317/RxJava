@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -16,9 +16,9 @@ package io.reactivex;
 import java.util.concurrent.CountDownLatch;
 
 import org.openjdk.jmh.infra.Blackhole;
-import org.reactivestreams.*;
+import org.reactivestreams.Subscription;
 
-public class PerfSubscriber implements Subscriber<Object> {
+public class PerfSubscriber implements FlowableSubscriber<Object> {
 
     public CountDownLatch latch = new CountDownLatch(1);
     private final Blackhole bh;

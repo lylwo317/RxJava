@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -102,8 +102,8 @@ public final class ObservableThrottleFirstTimed<T> extends AbstractObservableWit
                 RxJavaPlugins.onError(t);
             } else {
                 done = true;
-                DisposableHelper.dispose(this);
                 actual.onError(t);
+                worker.dispose();
             }
         }
 
@@ -111,22 +111,20 @@ public final class ObservableThrottleFirstTimed<T> extends AbstractObservableWit
         public void onComplete() {
             if (!done) {
                 done = true;
-                DisposableHelper.dispose(this);
-                worker.dispose();
                 actual.onComplete();
+                worker.dispose();
             }
         }
 
         @Override
         public void dispose() {
-            DisposableHelper.dispose(this);
-            worker.dispose();
             s.dispose();
+            worker.dispose();
         }
 
         @Override
         public boolean isDisposed() {
-            return DisposableHelper.isDisposed(get());
+            return worker.isDisposed();
         }
     }
 }

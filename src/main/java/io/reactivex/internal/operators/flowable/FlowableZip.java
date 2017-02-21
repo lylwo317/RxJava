@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
-import io.reactivex.Flowable;
+import io.reactivex.*;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -323,7 +323,7 @@ public final class FlowableZip<T, R> extends Flowable<R> {
     }
 
 
-    static final class ZipSubscriber<T, R> extends AtomicReference<Subscription> implements Subscriber<T>, Subscription {
+    static final class ZipSubscriber<T, R> extends AtomicReference<Subscription> implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = -4627193790118206028L;
 
@@ -357,7 +357,7 @@ public final class FlowableZip<T, R> extends Flowable<R> {
                 if (s instanceof QueueSubscription) {
                     QueueSubscription<T> f = (QueueSubscription<T>) s;
 
-                    int m = f.requestFusion(QueueSubscription.ANY);
+                    int m = f.requestFusion(QueueSubscription.ANY | QueueSubscription.BOUNDARY);
 
                     if (m == QueueSubscription.SYNC) {
                         sourceMode = m;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -34,7 +34,7 @@ public final class FlowableWindowBoundary<T, B> extends AbstractFlowableWithUpst
     final Publisher<B> other;
     final int bufferSize;
 
-    public FlowableWindowBoundary(Publisher<T> source, Publisher<B> other, int bufferSize) {
+    public FlowableWindowBoundary(Flowable<T> source, Publisher<B> other, int bufferSize) {
         super(source);
         this.other = other;
         this.bufferSize = bufferSize;

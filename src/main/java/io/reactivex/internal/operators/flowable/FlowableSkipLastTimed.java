@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -30,7 +30,7 @@ public final class FlowableSkipLastTimed<T> extends AbstractFlowableWithUpstream
     final int bufferSize;
     final boolean delayError;
 
-    public FlowableSkipLastTimed(Publisher<T> source, long time, TimeUnit unit, Scheduler scheduler, int bufferSize, boolean delayError) {
+    public FlowableSkipLastTimed(Flowable<T> source, long time, TimeUnit unit, Scheduler scheduler, int bufferSize, boolean delayError) {
         super(source);
         this.time = time;
         this.unit = unit;
@@ -44,7 +44,7 @@ public final class FlowableSkipLastTimed<T> extends AbstractFlowableWithUpstream
         source.subscribe(new SkipLastTimedSubscriber<T>(s, time, unit, scheduler, bufferSize, delayError));
     }
 
-    static final class SkipLastTimedSubscriber<T> extends AtomicInteger implements Subscriber<T>, Subscription {
+    static final class SkipLastTimedSubscriber<T> extends AtomicInteger implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = -5677354903406201275L;
         final Subscriber<? super T> actual;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -62,7 +62,7 @@ public class MaybeMergeArrayTest {
     @Test
     public void fusedEmptyCheck() {
         Maybe.mergeArray(Maybe.just(1), Maybe.<Integer>empty(), Maybe.just(2))
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
             QueueSubscription<Integer> qd;
             @Override
             public void onSubscribe(Subscription d) {
@@ -164,7 +164,7 @@ public class MaybeMergeArrayTest {
                 ts.assertFailure(Throwable.class);
 
                 if (!errors.isEmpty()) {
-                    TestHelper.assertError(errors, 0, TestException.class);
+                    TestHelper.assertUndeliverable(errors, 0, TestException.class);
                 }
             } finally {
                 RxJavaPlugins.reset();
@@ -192,7 +192,7 @@ public class MaybeMergeArrayTest {
     @Test
     public void smallOffer2Throws() {
         Maybe.mergeArray(Maybe.never(), Maybe.never())
-        .subscribe(new Subscriber<Object>() {
+        .subscribe(new FlowableSubscriber<Object>() {
 
             @SuppressWarnings("rawtypes")
             @Override
@@ -227,7 +227,7 @@ public class MaybeMergeArrayTest {
         Maybe<Integer>[] a = new Maybe[1024];
         Arrays.fill(a, Maybe.never());
         Maybe.mergeArray(a)
-        .subscribe(new Subscriber<Object>() {
+        .subscribe(new FlowableSubscriber<Object>() {
 
             @SuppressWarnings("rawtypes")
             @Override

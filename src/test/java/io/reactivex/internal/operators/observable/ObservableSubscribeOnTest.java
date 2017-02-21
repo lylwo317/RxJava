@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.annotations.NonNull;
 import org.junit.*;
 
 import io.reactivex.*;
@@ -117,6 +118,7 @@ public class ObservableSubscribeOnTest {
             this.unit = unit;
         }
 
+        @NonNull
         @Override
         public Worker createWorker() {
             return new SlowInner(actual.createWorker());
@@ -140,13 +142,15 @@ public class ObservableSubscribeOnTest {
                 return actualInner.isDisposed();
             }
 
+            @NonNull
             @Override
-            public Disposable schedule(final Runnable action) {
+            public Disposable schedule(@NonNull final Runnable action) {
                 return actualInner.schedule(action, delay, unit);
             }
 
+            @NonNull
             @Override
-            public Disposable schedule(final Runnable action, final long delayTime, final TimeUnit delayUnit) {
+            public Disposable schedule(@NonNull final Runnable action, final long delayTime, @NonNull final TimeUnit delayUnit) {
                 TimeUnit common = delayUnit.compareTo(unit) < 0 ? delayUnit : unit;
                 long t = common.convert(delayTime, delayUnit) + common.convert(delay, unit);
                 return actualInner.schedule(action, t, common);

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -158,26 +158,27 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                     }
                 } else {
                     InnerObserver<T, U> inner = new InnerObserver<T, U>(this, uniqueId++);
-                    addInner(inner);
-                    p.subscribe(inner);
+                    if (addInner(inner)) {
+                        p.subscribe(inner);
+                    }
                     break;
                 }
             }
         }
 
-        void addInner(InnerObserver<T, U> inner) {
+        boolean addInner(InnerObserver<T, U> inner) {
             for (;;) {
                 InnerObserver<?, ?>[] a = observers.get();
                 if (a == CANCELLED) {
                     inner.dispose();
-                    return;
+                    return false;
                 }
                 int n = a.length;
                 InnerObserver<?, ?>[] b = new InnerObserver[n + 1];
                 System.arraycopy(a, 0, b, 0, n);
                 b[n] = inner;
                 if (observers.compareAndSet(a, b)) {
-                    return;
+                    return true;
                 }
             }
         }
@@ -532,7 +533,7 @@ public final class ObservableFlatMap<T, U> extends AbstractObservableWithUpstrea
                     @SuppressWarnings("unchecked")
                     QueueDisposable<U> qd = (QueueDisposable<U>) s;
 
-                    int m = qd.requestFusion(QueueDisposable.ANY);
+                    int m = qd.requestFusion(QueueDisposable.ANY | QueueDisposable.BOUNDARY);
                     if (m == QueueDisposable.SYNC) {
                         fusionMode = m;
                         queue = qd;

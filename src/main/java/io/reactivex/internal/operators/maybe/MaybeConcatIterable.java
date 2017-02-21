@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -126,9 +126,10 @@ public final class MaybeConcatIterable<T> extends Flowable<T> {
 
             AtomicReference<Object> c = current;
             Subscriber<? super T> a = actual;
+            Disposable cancelled = disposables;
 
             for (;;) {
-                if (disposables.isDisposed()) {
+                if (cancelled.isDisposed()) {
                     c.lazySet(null);
                     return;
                 }
@@ -153,7 +154,7 @@ public final class MaybeConcatIterable<T> extends Flowable<T> {
                         c.lazySet(null);
                     }
 
-                    if (goNextSource) {
+                    if (goNextSource && !cancelled.isDisposed()) {
                         boolean b;
 
                         try {

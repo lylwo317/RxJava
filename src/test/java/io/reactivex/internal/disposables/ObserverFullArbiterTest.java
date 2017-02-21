@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -73,7 +73,7 @@ public class ObserverFullArbiterTest {
         try {
             fa.onError(new TestException(), bs);
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -90,7 +90,7 @@ public class ObserverFullArbiterTest {
             fa.dispose();
 
             fa.drain();
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }

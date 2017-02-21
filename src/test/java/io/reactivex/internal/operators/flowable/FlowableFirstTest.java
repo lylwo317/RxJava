@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -539,6 +539,47 @@ public class FlowableFirstTest {
     public void firstOrErrorError() {
         Flowable.error(new RuntimeException("error"))
             .firstOrError()
+            .test()
+            .assertNoValues()
+            .assertErrorMessage("error")
+            .assertError(RuntimeException.class);
+    }
+
+    @Test
+    public void firstOrErrorNoElementFlowable() {
+        Flowable.empty()
+            .firstOrError()
+            .toFlowable()
+            .test()
+            .assertNoValues()
+            .assertError(NoSuchElementException.class);
+    }
+
+    @Test
+    public void firstOrErrorOneElementFlowable() {
+        Flowable.just(1)
+            .firstOrError()
+            .toFlowable()
+            .test()
+            .assertNoErrors()
+            .assertValue(1);
+    }
+
+    @Test
+    public void firstOrErrorMultipleElementsFlowable() {
+        Flowable.just(1, 2, 3)
+            .firstOrError()
+            .toFlowable()
+            .test()
+            .assertNoErrors()
+            .assertValue(1);
+    }
+
+    @Test
+    public void firstOrErrorErrorFlowable() {
+        Flowable.error(new RuntimeException("error"))
+            .firstOrError()
+            .toFlowable()
             .test()
             .assertNoValues()
             .assertErrorMessage("error")

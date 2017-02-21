@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,14 +14,14 @@
 package io.reactivex;
 
 import org.openjdk.jmh.infra.Blackhole;
-import org.reactivestreams.*;
+import org.reactivestreams.Subscription;
 
 import io.reactivex.disposables.Disposable;
 
 /**
  * A multi-type synchronous consumer.
  */
-public final class PerfConsumer implements Subscriber<Object>, Observer<Object>,
+public final class PerfConsumer implements FlowableSubscriber<Object>, Observer<Object>,
 SingleObserver<Object>, CompletableObserver, MaybeObserver<Object> {
 
     final Blackhole bh;

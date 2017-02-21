@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -28,6 +28,7 @@ import io.reactivex.*;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler.Worker;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.*;
 import io.reactivex.exceptions.TestException;
 import io.reactivex.functions.*;
@@ -557,7 +558,7 @@ public class ObservableReplayTest {
     /**
      * Specifically test interaction with a Scheduler with subscribeOn.
      *
-     * @throws Exception
+     * @throws Exception functional interfaces are declared with throws Exception
      */
     @SuppressWarnings("unchecked")
     @Test
@@ -610,7 +611,7 @@ public class ObservableReplayTest {
     /**
      * Specifically test interaction with a Scheduler with subscribeOn.
      *
-     * @throws Exception
+     * @throws Exception functional interfaces are declared with throws Exception
      */
     @SuppressWarnings("unchecked")
     @Test
@@ -689,14 +690,16 @@ public class ObservableReplayTest {
             this.mockDisposable = mockDisposable;
         }
 
+        @NonNull
         @Override
-        public Disposable schedule(Runnable action) {
+        public Disposable schedule(@NonNull Runnable action) {
             action.run();
             return mockDisposable; // this subscription is returned but discarded
         }
 
+        @NonNull
         @Override
-        public Disposable schedule(Runnable action, long delayTime, TimeUnit unit) {
+        public Disposable schedule(@NonNull Runnable action, long delayTime, @NonNull TimeUnit unit) {
             action.run();
             return mockDisposable;
         }
@@ -1307,7 +1310,7 @@ public class ObservableReplayTest {
             .test()
             .assertFailureAndMessage(TestException.class, "First");
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -1486,5 +1489,26 @@ public class ObservableReplayTest {
         ps.onNext(1);
 
         to.assertValues(1);
+    }
+
+    @Test
+    public void delayedUpstreamOnSubscribe() {
+        final Observer<?>[] sub = { null };
+
+        new Observable<Integer>() {
+            @Override
+            protected void subscribeActual(Observer<? super Integer> s) {
+                sub[0] = s;
+            }
+        }
+        .replay()
+        .connect()
+        .dispose();
+
+        Disposable bs = Disposables.empty();
+
+        sub[0].onSubscribe(bs);
+
+        assertTrue(bs.isDisposed());
     }
 }

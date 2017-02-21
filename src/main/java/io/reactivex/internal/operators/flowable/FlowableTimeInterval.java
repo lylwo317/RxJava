@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -25,7 +25,7 @@ public final class FlowableTimeInterval<T> extends AbstractFlowableWithUpstream<
     final Scheduler scheduler;
     final TimeUnit unit;
 
-    public FlowableTimeInterval(Publisher<T> source, TimeUnit unit, Scheduler scheduler) {
+    public FlowableTimeInterval(Flowable<T> source, TimeUnit unit, Scheduler scheduler) {
         super(source);
         this.scheduler = scheduler;
         this.unit = unit;
@@ -37,7 +37,7 @@ public final class FlowableTimeInterval<T> extends AbstractFlowableWithUpstream<
         source.subscribe(new TimeIntervalSubscriber<T>(s, unit, scheduler));
     }
 
-    static final class TimeIntervalSubscriber<T> implements Subscriber<T>, Subscription {
+    static final class TimeIntervalSubscriber<T> implements FlowableSubscriber<T>, Subscription {
         final Subscriber<? super Timed<T>> actual;
         final TimeUnit unit;
         final Scheduler scheduler;

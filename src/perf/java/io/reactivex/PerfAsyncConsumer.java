@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -23,7 +23,7 @@ import io.reactivex.disposables.Disposable;
 /**
  * A multi-type asynchronous consumer.
  */
-public final class PerfAsyncConsumer extends CountDownLatch implements Subscriber<Object>, Observer<Object>,
+public final class PerfAsyncConsumer extends CountDownLatch implements FlowableSubscriber<Object>, Observer<Object>,
 SingleObserver<Object>, CompletableObserver, MaybeObserver<Object> {
 
     final Blackhole bh;

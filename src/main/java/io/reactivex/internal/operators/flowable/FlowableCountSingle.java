@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -23,9 +23,9 @@ import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableCountSingle<T> extends Single<Long> implements FuseToFlowable<Long> {
 
-    final Publisher<T> source;
+    final Flowable<T> source;
 
-    public FlowableCountSingle(Publisher<T> source) {
+    public FlowableCountSingle(Flowable<T> source) {
         this.source = source;
     }
 
@@ -39,7 +39,7 @@ public final class FlowableCountSingle<T> extends Single<Long> implements FuseTo
         return RxJavaPlugins.onAssembly(new FlowableCount<T>(source));
     }
 
-    static final class CountSubscriber implements Subscriber<Object>, Disposable {
+    static final class CountSubscriber implements FlowableSubscriber<Object>, Disposable {
 
         final SingleObserver<? super Long> actual;
 

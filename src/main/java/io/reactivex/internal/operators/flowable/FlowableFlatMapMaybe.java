@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -41,7 +41,7 @@ public final class FlowableFlatMapMaybe<T, R> extends AbstractFlowableWithUpstre
 
     final int maxConcurrency;
 
-    public FlowableFlatMapMaybe(Publisher<T> source, Function<? super T, ? extends MaybeSource<? extends R>> mapper,
+    public FlowableFlatMapMaybe(Flowable<T> source, Function<? super T, ? extends MaybeSource<? extends R>> mapper,
             boolean delayError, int maxConcurrency) {
         super(source);
         this.mapper = mapper;
@@ -56,7 +56,7 @@ public final class FlowableFlatMapMaybe<T, R> extends AbstractFlowableWithUpstre
 
     static final class FlatMapMaybeSubscriber<T, R>
     extends AtomicInteger
-    implements Subscriber<T>, Subscription {
+    implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = 8600231336733376951L;
 
@@ -128,9 +128,9 @@ public final class FlowableFlatMapMaybe<T, R> extends AbstractFlowableWithUpstre
 
             InnerObserver inner = new InnerObserver();
 
-            set.add(inner);
-
-            ms.subscribe(inner);
+            if (set.add(inner)) {
+                ms.subscribe(inner);
+            }
         }
 
         @Override

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.Subscription;
 
+import io.reactivex.exceptions.ProtocolViolationException;
 import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.util.BackpressureHelper;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -67,7 +68,7 @@ public enum SubscriptionHelper implements Subscription {
      * which is an indication of a onSubscribe management bug.
      */
     public static void reportSubscriptionSet() {
-        RxJavaPlugins.onError(new IllegalStateException("Subscription already set!"));
+        RxJavaPlugins.onError(new ProtocolViolationException("Subscription already set!"));
     }
 
     /**
@@ -89,7 +90,7 @@ public enum SubscriptionHelper implements Subscription {
      * @param n the overproduction amount
      */
     public static void reportMoreProduced(long n) {
-        RxJavaPlugins.onError(new IllegalStateException("More produced than requested: " + n));
+        RxJavaPlugins.onError(new ProtocolViolationException("More produced than requested: " + n));
     }
     /**
      * Check if the given subscription is the common cancelled subscription.

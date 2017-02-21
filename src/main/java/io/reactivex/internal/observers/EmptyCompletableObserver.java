@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,7 +17,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.CompletableObserver;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.internal.disposables.*;
+import io.reactivex.exceptions.OnErrorNotImplementedException;
+import io.reactivex.internal.disposables.DisposableHelper;
 import io.reactivex.plugins.RxJavaPlugins;
 
 public final class EmptyCompletableObserver
@@ -46,7 +47,7 @@ implements CompletableObserver, Disposable {
     @Override
     public void onError(Throwable e) {
         lazySet(DisposableHelper.DISPOSED);
-        RxJavaPlugins.onError(e);
+        RxJavaPlugins.onError(new OnErrorNotImplementedException(e));
     }
 
     @Override

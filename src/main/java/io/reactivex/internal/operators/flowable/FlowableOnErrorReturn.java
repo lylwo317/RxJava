@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,8 +13,9 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscriber;
 
+import io.reactivex.Flowable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -22,7 +23,7 @@ import io.reactivex.internal.subscribers.SinglePostCompleteSubscriber;
 
 public final class FlowableOnErrorReturn<T> extends AbstractFlowableWithUpstream<T, T> {
     final Function<? super Throwable, ? extends T> valueSupplier;
-    public FlowableOnErrorReturn(Publisher<T> source, Function<? super Throwable, ? extends T> valueSupplier) {
+    public FlowableOnErrorReturn(Flowable<T> source, Function<? super Throwable, ? extends T> valueSupplier) {
         super(source);
         this.valueSupplier = valueSupplier;
     }

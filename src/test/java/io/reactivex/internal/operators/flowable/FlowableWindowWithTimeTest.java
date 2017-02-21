@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -685,5 +685,23 @@ public class FlowableWindowWithTimeTest {
         to
         .awaitDone(1, TimeUnit.SECONDS)
         .assertResult(1, 2);
+    }
+
+    @Test
+    public void sizeTimeTimeout() {
+        TestScheduler scheduler = new TestScheduler();
+        PublishProcessor<Integer> ps = PublishProcessor.<Integer>create();
+
+        TestSubscriber<Flowable<Integer>> ts = ps.window(5, TimeUnit.MILLISECONDS, scheduler, 100)
+        .test()
+        .assertValueCount(1);
+
+        scheduler.advanceTimeBy(5, TimeUnit.MILLISECONDS);
+
+        ts.assertValueCount(2)
+        .assertNoErrors()
+        .assertNotComplete();
+
+        ts.values().get(0).test().assertResult();
     }
 }

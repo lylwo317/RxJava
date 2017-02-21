@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -33,7 +33,7 @@ public final class FlowableSubscribeOn<T> extends AbstractFlowableWithUpstream<T
 
     final boolean nonScheduledRequests;
 
-    public FlowableSubscribeOn(Publisher<T> source, Scheduler scheduler, boolean nonScheduledRequests) {
+    public FlowableSubscribeOn(Flowable<T> source, Scheduler scheduler, boolean nonScheduledRequests) {
         super(source);
         this.scheduler = scheduler;
         this.nonScheduledRequests = nonScheduledRequests;
@@ -49,7 +49,7 @@ public final class FlowableSubscribeOn<T> extends AbstractFlowableWithUpstream<T
     }
 
     static final class SubscribeOnSubscriber<T> extends AtomicReference<Thread>
-    implements Subscriber<T>, Subscription, Runnable {
+    implements FlowableSubscriber<T>, Subscription, Runnable {
 
         private static final long serialVersionUID = 8094547886072529208L;
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 
 package io.reactivex.subjects;
 
+import io.reactivex.annotations.CheckReturnValue;
 import java.util.concurrent.atomic.*;
 
 import io.reactivex.Observer;
@@ -23,7 +24,7 @@ import io.reactivex.plugins.RxJavaPlugins;
  * Subject that, once an {@link Observer} has subscribed, emits all subsequently observed items to the
  * subscriber.
  * <p>
- * <img width="640" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.PublishSubject.png" alt="">
+ * <img width="640" height="405" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.PublishSubject.png" alt="">
  * <p>
  * Example usage:
  * <p>
@@ -63,6 +64,7 @@ public final class PublishSubject<T> extends Subject<T> {
      * @param <T> the value type
      * @return the new PublishSubject
      */
+    @CheckReturnValue
     public static <T> PublishSubject<T> create() {
         return new PublishSubject<T>();
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -32,6 +32,7 @@ import io.reactivex.exceptions.*;
 import io.reactivex.functions.*;
 import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.fuseable.*;
+import io.reactivex.internal.operators.completable.CompletableToFlowable;
 import io.reactivex.internal.operators.maybe.MaybeToFlowable;
 import io.reactivex.internal.operators.single.SingleToFlowable;
 import io.reactivex.internal.subscriptions.BooleanSubscription;
@@ -54,8 +55,8 @@ public enum TestHelper {
      * @return the mocked subscriber
      */
     @SuppressWarnings("unchecked")
-    public static <T> Subscriber<T> mockSubscriber() {
-        Subscriber<T> w = mock(Subscriber.class);
+    public static <T> FlowableSubscriber<T> mockSubscriber() {
+        FlowableSubscriber<T> w = mock(FlowableSubscriber.class);
 
         Mockito.doAnswer(new Answer<Object>() {
             @Override
@@ -153,11 +154,46 @@ public enum TestHelper {
         }
     }
 
+    public static void assertUndeliverable(List<Throwable> list, int index, Class<? extends Throwable> clazz) {
+        Throwable ex = list.get(index);
+        if (!(ex instanceof UndeliverableException)) {
+            AssertionError err = new AssertionError("Outer exception UndeliverableException expected but got " + list.get(index));
+            err.initCause(list.get(index));
+            throw err;
+        }
+        ex = ex.getCause();
+        if (!clazz.isInstance(ex)) {
+            AssertionError err = new AssertionError("Inner exception " + clazz + " expected but got " + list.get(index));
+            err.initCause(list.get(index));
+            throw err;
+        }
+    }
+
     public static void assertError(List<Throwable> list, int index, Class<? extends Throwable> clazz, String message) {
         Throwable ex = list.get(index);
         if (!clazz.isInstance(ex)) {
             AssertionError err = new AssertionError("Type " + clazz + " expected but got " + ex);
             err.initCause(ex);
+            throw err;
+        }
+        if (!ObjectHelper.equals(message, ex.getMessage())) {
+            AssertionError err = new AssertionError("Message " + message + " expected but got " + ex.getMessage());
+            err.initCause(ex);
+            throw err;
+        }
+    }
+
+    public static void assertUndeliverable(List<Throwable> list, int index, Class<? extends Throwable> clazz, String message) {
+        Throwable ex = list.get(index);
+        if (!(ex instanceof UndeliverableException)) {
+            AssertionError err = new AssertionError("Outer exception UndeliverableException expected but got " + list.get(index));
+            err.initCause(list.get(index));
+            throw err;
+        }
+        ex = ex.getCause();
+        if (!clazz.isInstance(ex)) {
+            AssertionError err = new AssertionError("Inner exception " + clazz + " expected but got " + list.get(index));
+            err.initCause(list.get(index));
             throw err;
         }
         if (!ObjectHelper.equals(message, ex.getMessage())) {
@@ -259,7 +295,7 @@ public enum TestHelper {
         try {
             final CountDownLatch cdl = new CountDownLatch(1);
 
-            source.subscribe(new Subscriber<Object>() {
+            source.subscribe(new FlowableSubscriber<Object>() {
 
                 @Override
                 public void onSubscribe(Subscription s) {
@@ -385,6 +421,9 @@ public enum TestHelper {
      * @return the list of Throwables
      */
     public static List<Throwable> compositeList(Throwable ex) {
+        if (ex instanceof UndeliverableException) {
+            ex = ex.getCause();
+        }
         return ((CompositeException)ex).getExceptions();
     }
 
@@ -607,7 +646,7 @@ public enum TestHelper {
      */
     public static void checkDisposed(Flowable<?> source) {
         final TestSubscriber<Object> ts = new TestSubscriber<Object>(0L);
-        source.subscribe(new Subscriber<Object>() {
+        source.subscribe(new FlowableSubscriber<Object>() {
             @Override
             public void onSubscribe(Subscription s) {
                 ts.onSubscribe(new BooleanSubscription());
@@ -831,7 +870,7 @@ public enum TestHelper {
     /**
      * Consumer for all base reactive types.
      */
-    enum NoOpConsumer implements Subscriber<Object>, Observer<Object>, MaybeObserver<Object>, SingleObserver<Object>, CompletableObserver {
+    enum NoOpConsumer implements FlowableSubscriber<Object>, Observer<Object>, MaybeObserver<Object>, SingleObserver<Object>, CompletableObserver {
         INSTANCE;
 
         @Override
@@ -1963,6 +2002,28 @@ public enum TestHelper {
     }
 
     /**
+     * Check if the operator applied to a Completable source propagates dispose properly.
+     * @param composer the function to apply an operator to the provided Completable source
+     */
+    public static void checkDisposedCompletable(Function<Completable, ? extends CompletableSource> composer) {
+        PublishProcessor<Integer> pp = PublishProcessor.create();
+
+        TestSubscriber<Integer> ts = new TestSubscriber<Integer>();
+
+        try {
+            new CompletableToFlowable<Integer>(composer.apply(pp.ignoreElements())).subscribe(ts);
+        } catch (Throwable ex) {
+            throw ExceptionHelper.wrapOrThrow(ex);
+        }
+
+        assertTrue("Not subscribed to source!", pp.hasSubscribers());
+
+        ts.cancel();
+
+        assertFalse("Dispose not propagated!", pp.hasSubscribers());
+    }
+
+    /**
      * Check if the operator applied to a Maybe source propagates dispose properly.
      * @param <T> the source value type
      * @param <U> the output value type
@@ -2176,7 +2237,7 @@ public enum TestHelper {
 
         final Boolean[] state = { null, null, null, null };
 
-        source.subscribe(new Subscriber<T>() {
+        source.subscribe(new FlowableSubscriber<T>() {
             @Override
             public void onSubscribe(Subscription d) {
                 try {
@@ -2405,7 +2466,7 @@ public enum TestHelper {
                 }
             }
 
-            assertError(errors, 0, TestException.class, "second");
+            assertUndeliverable(errors, 0, TestException.class, "second");
         } catch (AssertionError ex) {
             throw ex;
         } catch (Throwable ex) {
@@ -2564,7 +2625,7 @@ public enum TestHelper {
                 }
             }
 
-            assertError(errors, 0, TestException.class, "second");
+            assertUndeliverable(errors, 0, TestException.class, "second");
         } catch (AssertionError ex) {
             throw ex;
         } catch (Throwable ex) {

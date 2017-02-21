@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -43,8 +43,7 @@ public final class DisposableLambdaObserver<T> implements Observer<T>, Disposabl
         } catch (Throwable e) {
             Exceptions.throwIfFatal(e);
             s.dispose();
-            RxJavaPlugins.onError(e);
-
+            this.s = DisposableHelper.DISPOSED;
             EmptyDisposable.error(e, actual);
             return;
         }
@@ -61,12 +60,18 @@ public final class DisposableLambdaObserver<T> implements Observer<T>, Disposabl
 
     @Override
     public void onError(Throwable t) {
-        actual.onError(t);
+        if (s != DisposableHelper.DISPOSED) {
+            actual.onError(t);
+        } else {
+            RxJavaPlugins.onError(t);
+        }
     }
 
     @Override
     public void onComplete() {
-        actual.onComplete();
+        if (s != DisposableHelper.DISPOSED) {
+            actual.onComplete();
+        }
     }
 
 

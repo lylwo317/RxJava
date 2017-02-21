@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,7 +15,7 @@ package io.reactivex.internal.operators.flowable;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
+import java.util.*;
 
 import org.junit.Test;
 import org.reactivestreams.*;
@@ -318,7 +318,7 @@ public class FlowableDoFinallyTest implements Action {
             .assertResult(1)
             .cancel();
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -340,7 +340,7 @@ public class FlowableDoFinallyTest implements Action {
             .assertResult(1)
             .cancel();
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -350,7 +350,7 @@ public class FlowableDoFinallyTest implements Action {
     public void clearIsEmpty() {
         Flowable.range(1, 5)
         .doFinally(this)
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
 
             @Override
             public void onSubscribe(Subscription s) {
@@ -397,7 +397,7 @@ public class FlowableDoFinallyTest implements Action {
         Flowable.range(1, 5)
         .doFinally(this)
         .filter(Functions.alwaysTrue())
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
 
             @Override
             public void onSubscribe(Subscription s) {
@@ -437,5 +437,85 @@ public class FlowableDoFinallyTest implements Action {
         });
 
         assertEquals(1, calls);
+    }
+
+    @Test
+    public void eventOrdering() {
+        final List<String> list = new ArrayList<String>();
+
+        Flowable.error(new TestException())
+        .doOnCancel(new Action() {
+            @Override
+            public void run() throws Exception {
+                list.add("cancel");
+            }
+        })
+        .doFinally(new Action() {
+            @Override
+            public void run() throws Exception {
+                list.add("finally");
+            }
+        })
+        .subscribe(
+                new Consumer<Object>() {
+                    @Override
+                    public void accept(Object v) throws Exception {
+                        list.add("onNext");
+                    }
+                },
+                new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable e) throws Exception {
+                        list.add("onError");
+                    }
+                },
+                new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        list.add("onComplete");
+                    }
+                });
+
+        assertEquals(Arrays.asList("onError", "finally"), list);
+    }
+
+    @Test
+    public void eventOrdering2() {
+        final List<String> list = new ArrayList<String>();
+
+        Flowable.just(1)
+        .doOnCancel(new Action() {
+            @Override
+            public void run() throws Exception {
+                list.add("cancel");
+            }
+        })
+        .doFinally(new Action() {
+            @Override
+            public void run() throws Exception {
+                list.add("finally");
+            }
+        })
+        .subscribe(
+                new Consumer<Object>() {
+                    @Override
+                    public void accept(Object v) throws Exception {
+                        list.add("onNext");
+                    }
+                },
+                new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable e) throws Exception {
+                        list.add("onError");
+                    }
+                },
+                new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        list.add("onComplete");
+                    }
+                });
+
+        assertEquals(Arrays.asList("onNext", "onComplete", "finally"), list);
     }
 }

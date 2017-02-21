@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -23,11 +23,11 @@ import io.reactivex.internal.subscriptions.SubscriptionHelper;
 import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableAnySingle<T> extends Single<Boolean> implements FuseToFlowable<Boolean> {
-    final Publisher<T> source;
+    final Flowable<T> source;
 
     final Predicate<? super T> predicate;
 
-    public FlowableAnySingle(Publisher<T> source, Predicate<? super T> predicate) {
+    public FlowableAnySingle(Flowable<T> source, Predicate<? super T> predicate) {
         this.source = source;
         this.predicate = predicate;
     }
@@ -42,7 +42,7 @@ public final class FlowableAnySingle<T> extends Single<Boolean> implements FuseT
         return RxJavaPlugins.onAssembly(new FlowableAny<T>(source, predicate));
     }
 
-    static final class AnySubscriber<T> implements Subscriber<T>, Disposable {
+    static final class AnySubscriber<T> implements FlowableSubscriber<T>, Disposable {
 
         final SingleObserver<? super Boolean> actual;
 

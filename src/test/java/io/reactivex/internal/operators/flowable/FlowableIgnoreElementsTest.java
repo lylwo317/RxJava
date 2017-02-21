@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -91,6 +91,8 @@ public class FlowableIgnoreElementsTest {
             public void run() {
                 unsub.set(true);
             }})
+            .ignoreElements()
+            .toFlowable()
             .subscribe().dispose();
 
         assertTrue(unsub.get());
@@ -207,6 +209,7 @@ public class FlowableIgnoreElementsTest {
             public void run() {
                 unsub.set(true);
             }})
+            .ignoreElements()
             .subscribe().dispose();
 
         assertTrue(unsub.get());
@@ -270,7 +273,7 @@ public class FlowableIgnoreElementsTest {
     @Test
     public void fusedAPICalls() {
         Flowable.just(1).hide().ignoreElements().<Integer>toFlowable()
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
 
             @Override
             public void onSubscribe(Subscription s) {

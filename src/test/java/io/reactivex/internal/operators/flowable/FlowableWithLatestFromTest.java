@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -649,7 +649,7 @@ public class FlowableWithLatestFromTest {
             .test()
             .assertFailureAndMessage(TestException.class, "First");
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -676,9 +676,36 @@ public class FlowableWithLatestFromTest {
             .test()
             .assertFailureAndMessage(TestException.class, "First");
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
+    }
+
+    @Test
+    public void combineToNull1() {
+        Flowable.just(1)
+        .withLatestFrom(Flowable.just(2), new BiFunction<Integer, Integer, Object>() {
+            @Override
+            public Object apply(Integer a, Integer b) throws Exception {
+                return null;
+            }
+        })
+        .test()
+        .assertFailure(NullPointerException.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void combineToNull2() {
+        Flowable.just(1)
+        .withLatestFrom(Arrays.asList(Flowable.just(2), Flowable.just(3)), new Function<Object[], Object>() {
+            @Override
+            public Object apply(Object[] o) throws Exception {
+                return null;
+            }
+        })
+        .test()
+        .assertFailure(NullPointerException.class);
     }
 }

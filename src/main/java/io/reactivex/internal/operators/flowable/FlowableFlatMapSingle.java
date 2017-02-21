@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -41,7 +41,7 @@ public final class FlowableFlatMapSingle<T, R> extends AbstractFlowableWithUpstr
 
     final int maxConcurrency;
 
-    public FlowableFlatMapSingle(Publisher<T> source, Function<? super T, ? extends SingleSource<? extends R>> mapper,
+    public FlowableFlatMapSingle(Flowable<T> source, Function<? super T, ? extends SingleSource<? extends R>> mapper,
             boolean delayError, int maxConcurrency) {
         super(source);
         this.mapper = mapper;
@@ -56,7 +56,7 @@ public final class FlowableFlatMapSingle<T, R> extends AbstractFlowableWithUpstr
 
     static final class FlatMapSingleSubscriber<T, R>
     extends AtomicInteger
-    implements Subscriber<T>, Subscription {
+    implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = 8600231336733376951L;
 
@@ -128,9 +128,9 @@ public final class FlowableFlatMapSingle<T, R> extends AbstractFlowableWithUpstr
 
             InnerObserver inner = new InnerObserver();
 
-            set.add(inner);
-
-            ms.subscribe(inner);
+            if (set.add(inner)) {
+                ms.subscribe(inner);
+            }
         }
 
         @Override

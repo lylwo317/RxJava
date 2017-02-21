@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -342,5 +342,17 @@ public class FlowableRepeatTest {
         .test()
         .awaitDone(5, TimeUnit.SECONDS)
         .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void whenTake() {
+        Flowable.range(1, 3).repeatWhen(new Function<Flowable<Object>, Flowable<Object>>() {
+            @Override
+            public Flowable<Object> apply(Flowable<Object> handler) throws Exception {
+                return handler.take(2);
+            }
+        })
+        .test()
+        .assertResult(1, 2, 3, 1, 2, 3);
     }
 }

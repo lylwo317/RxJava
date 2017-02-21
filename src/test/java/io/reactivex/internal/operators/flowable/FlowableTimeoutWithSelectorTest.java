@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,7 +13,7 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -447,7 +447,7 @@ public class FlowableTimeoutWithSelectorTest {
 
             to.assertFailureAndMessage(TestException.class, "First", 1);
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -476,7 +476,7 @@ public class FlowableTimeoutWithSelectorTest {
 
             to.assertFailureAndMessage(TestException.class, "First", 1);
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -508,5 +508,41 @@ public class FlowableTimeoutWithSelectorTest {
         .take(1)
         .test()
         .assertResult(1);
+    }
+
+    @Test
+    public void selectorTake() {
+        PublishProcessor<Integer> ps = PublishProcessor.create();
+
+        TestSubscriber<Integer> to = ps
+        .timeout(Functions.justFunction(Flowable.never()))
+        .take(1)
+        .test();
+
+        assertTrue(ps.hasSubscribers());
+
+        ps.onNext(1);
+
+        assertFalse(ps.hasSubscribers());
+
+        to.assertResult(1);
+    }
+
+    @Test
+    public void selectorFallbackTake() {
+        PublishProcessor<Integer> ps = PublishProcessor.create();
+
+        TestSubscriber<Integer> to = ps
+        .timeout(Functions.justFunction(Flowable.never()), Flowable.just(2))
+        .take(1)
+        .test();
+
+        assertTrue(ps.hasSubscribers());
+
+        ps.onNext(1);
+
+        assertFalse(ps.hasSubscribers());
+
+        to.assertResult(1);
     }
 }

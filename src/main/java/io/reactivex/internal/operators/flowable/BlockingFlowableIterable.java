@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,20 +17,21 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscription;
 
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.MissingBackpressureException;
 import io.reactivex.internal.queue.SpscArrayQueue;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
-import io.reactivex.internal.util.ExceptionHelper;
+import io.reactivex.internal.util.*;
 
 public final class BlockingFlowableIterable<T> implements Iterable<T> {
-    final Publisher<? extends T> source;
+    final Flowable<? extends T> source;
 
     final int bufferSize;
 
-    public BlockingFlowableIterable(Publisher<? extends T> source, int bufferSize) {
+    public BlockingFlowableIterable(Flowable<? extends T> source, int bufferSize) {
         this.source = source;
         this.bufferSize = bufferSize;
     }
@@ -44,7 +45,7 @@ public final class BlockingFlowableIterable<T> implements Iterable<T> {
 
     static final class BlockingFlowableIterator<T>
     extends AtomicReference<Subscription>
-    implements Subscriber<T>, Iterator<T>, Runnable, Disposable {
+    implements FlowableSubscriber<T>, Iterator<T>, Runnable, Disposable {
 
         private static final long serialVersionUID = 6695226475494099826L;
 
@@ -86,6 +87,7 @@ public final class BlockingFlowableIterable<T> implements Iterable<T> {
                     }
                 }
                 if (empty) {
+                    BlockingHelper.verifyNonBlocking();
                     lock.lock();
                     try {
                         while (!done && queue.isEmpty()) {

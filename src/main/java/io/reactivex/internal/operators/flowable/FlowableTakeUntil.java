@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,12 +17,13 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
 import io.reactivex.internal.util.*;
 
 public final class FlowableTakeUntil<T, U> extends AbstractFlowableWithUpstream<T, T> {
     final Publisher<? extends U> other;
-    public FlowableTakeUntil(Publisher<T> source, Publisher<? extends U> other) {
+    public FlowableTakeUntil(Flowable<T> source, Publisher<? extends U> other) {
         super(source);
         this.other = other;
     }
@@ -37,7 +38,7 @@ public final class FlowableTakeUntil<T, U> extends AbstractFlowableWithUpstream<
         source.subscribe(parent);
     }
 
-    static final class TakeUntilMainSubscriber<T> extends AtomicInteger implements Subscriber<T>, Subscription {
+    static final class TakeUntilMainSubscriber<T> extends AtomicInteger implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = -4945480365982832967L;
 
@@ -92,7 +93,7 @@ public final class FlowableTakeUntil<T, U> extends AbstractFlowableWithUpstream<
             SubscriptionHelper.cancel(other);
         }
 
-        final class OtherSubscriber extends AtomicReference<Subscription> implements Subscriber<Object> {
+        final class OtherSubscriber extends AtomicReference<Subscription> implements FlowableSubscriber<Object> {
 
             private static final long serialVersionUID = -3592821756711087922L;
 

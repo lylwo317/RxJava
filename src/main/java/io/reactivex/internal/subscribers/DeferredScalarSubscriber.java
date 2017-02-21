@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package io.reactivex.internal.subscribers;
 
 import org.reactivestreams.*;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.internal.subscriptions.*;
 
 /**
@@ -24,7 +25,7 @@ import io.reactivex.internal.subscriptions.*;
  * @param <R> the output value type
  */
 public abstract class DeferredScalarSubscriber<T, R> extends DeferredScalarSubscription<R>
-implements Subscriber<T> {
+implements FlowableSubscriber<T> {
 
     private static final long serialVersionUID = 2984505488220891551L;
 

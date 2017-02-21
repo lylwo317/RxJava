@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,13 +17,14 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.internal.fuseable.ConditionalSubscriber;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
 import io.reactivex.internal.util.*;
 
 public final class FlowableSkipUntil<T, U> extends AbstractFlowableWithUpstream<T, T> {
     final Publisher<U> other;
-    public FlowableSkipUntil(Publisher<T> source, Publisher<U> other) {
+    public FlowableSkipUntil(Flowable<T> source, Publisher<U> other) {
         super(source);
         this.other = other;
     }
@@ -107,7 +108,7 @@ public final class FlowableSkipUntil<T, U> extends AbstractFlowableWithUpstream<
         }
 
         final class OtherSubscriber extends AtomicReference<Subscription>
-        implements Subscriber<Object> {
+        implements FlowableSubscriber<Object> {
 
             private static final long serialVersionUID = -5592042965931999169L;
 

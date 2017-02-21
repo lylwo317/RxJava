@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -100,7 +100,7 @@ public class CompletableAmbTest {
                 to.assertFailure(TestException.class);
 
                 if (!errors.isEmpty()) {
-                    TestHelper.assertError(errors, 0, TestException.class);
+                    TestHelper.assertUndeliverable(errors, 0, TestException.class);
                 }
             } finally {
                 RxJavaPlugins.reset();
@@ -143,6 +143,24 @@ public class CompletableAmbTest {
                 RxJavaPlugins.reset();
             }
         }
+    }
+
+    @Test
+    public void ambWithOrder() {
+        Completable error = Completable.error(new RuntimeException());
+        Completable.complete().ambWith(error).test().assertComplete();
+    }
+
+    @Test
+    public void ambIterableOrder() {
+        Completable error = Completable.error(new RuntimeException());
+        Completable.amb(Arrays.asList(Completable.complete(), error)).test().assertComplete();
+    }
+
+    @Test
+    public void ambArrayOrder() {
+        Completable error = Completable.error(new RuntimeException());
+        Completable.ambArray(Completable.complete(), error).test().assertComplete();
     }
 
 }

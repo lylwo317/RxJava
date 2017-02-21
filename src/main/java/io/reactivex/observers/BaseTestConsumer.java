@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import io.reactivex.Notification;
+import io.reactivex.annotations.Experimental;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.CompositeException;
 import io.reactivex.functions.Predicate;
@@ -117,6 +118,7 @@ public abstract class BaseTestConsumer<T, U extends BaseTestConsumer<T, U>> impl
      * will capture those potential errors and report it along with the original failure.
      *
      * @param message the message to use
+     * @return AssertionError the prepared AssertionError instance
      */
     protected final AssertionError fail(String message) {
         StringBuilder b = new StringBuilder(64 + message.length());
@@ -303,6 +305,28 @@ public abstract class BaseTestConsumer<T, U extends BaseTestConsumer<T, U>> impl
     }
 
     /**
+     * Assert that this TestObserver/TestSubscriber did not receive an onNext value which is equal to
+     * the given value with respect to Objects.equals.
+     *
+     * @since 2.0.5 - experimental
+     * @param value the value to expect not being received
+     * @return this;
+     */
+    @Experimental
+    @SuppressWarnings("unchecked")
+    public final U assertNever(T value) {
+        int s = values.size();
+
+        for (int i = 0; i < s; i++) {
+            T v = this.values.get(i);
+            if (ObjectHelper.equals(v, value)) {
+                throw fail("Value at position " + i + " is equal to " + valueAndClass(value) + "; Expected them to be different");
+            }
+        }
+        return (U) this;
+    }
+
+    /**
      * Asserts that this TestObserver/TestSubscriber received exactly one onNext value for which
      * the provided predicate returns true.
      * @param valuePredicate
@@ -318,6 +342,33 @@ public abstract class BaseTestConsumer<T, U extends BaseTestConsumer<T, U>> impl
             throw fail("Value present but other values as well");
         }
 
+        return (U)this;
+    }
+
+    /**
+     * Asserts that this TestObserver/TestSubscriber did not receive any onNext value for which
+     * the provided predicate returns true.
+     *
+     * @since 2.0.5 - experimental
+     * @param valuePredicate the predicate that receives the onNext value
+     *                       and should return true for the expected value.
+     * @return this
+     */
+    @Experimental
+    @SuppressWarnings("unchecked")
+    public final U assertNever(Predicate<? super T> valuePredicate) {
+        int s = values.size();
+
+        for (int i = 0; i < s; i++) {
+            T v = this.values.get(i);
+            try {
+                if (valuePredicate.test(v)) {
+                    throw fail("Value at position " + i + " matches predicate " + valuePredicate.toString() + ", which was not expected.");
+                }
+            } catch (Exception ex) {
+                throw ExceptionHelper.wrapOrThrow(ex);
+            }
+        }
         return (U)this;
     }
 

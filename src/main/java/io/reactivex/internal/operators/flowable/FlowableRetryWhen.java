@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -27,7 +27,7 @@ import io.reactivex.subscribers.SerializedSubscriber;
 public final class FlowableRetryWhen<T> extends AbstractFlowableWithUpstream<T, T> {
     final Function<? super Flowable<Throwable>, ? extends Publisher<?>> handler;
 
-    public FlowableRetryWhen(Publisher<T> source,
+    public FlowableRetryWhen(Flowable<T> source,
             Function<? super Flowable<Throwable>, ? extends Publisher<?>> handler) {
         super(source);
         this.handler = handler;

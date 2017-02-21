@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -609,7 +609,7 @@ public class FlowableFlattenIterableTest {
     public void fusionMethods() {
         Flowable.just(1, 2)
         .flatMapIterable(Functions.justFunction(Arrays.asList(1, 2, 3)))
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
             @Override
             public void onSubscribe(Subscription s) {
                 @SuppressWarnings("unchecked")
@@ -737,7 +737,7 @@ public class FlowableFlattenIterableTest {
                 return Arrays.asList(v);
             }
         })
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
             @Override
             public void onSubscribe(Subscription s) {
                 @SuppressWarnings("unchecked")

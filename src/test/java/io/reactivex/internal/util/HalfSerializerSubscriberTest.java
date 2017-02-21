@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -12,7 +12,7 @@
  */
 package io.reactivex.internal.util;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.reactivestreams.*;
 
-import io.reactivex.TestHelper;
+import io.reactivex.*;
 import io.reactivex.exceptions.TestException;
 import io.reactivex.internal.subscriptions.BooleanSubscription;
 import io.reactivex.schedulers.Schedulers;
@@ -43,7 +43,7 @@ public class HalfSerializerSubscriberTest {
 
         final TestSubscriber ts = new TestSubscriber();
 
-        Subscriber s = new Subscriber() {
+        FlowableSubscriber s = new FlowableSubscriber() {
             @Override
             public void onSubscribe(Subscription s) {
                 ts.onSubscribe(s);
@@ -87,7 +87,7 @@ public class HalfSerializerSubscriberTest {
 
         final TestSubscriber ts = new TestSubscriber();
 
-        Subscriber s = new Subscriber() {
+        FlowableSubscriber s = new FlowableSubscriber() {
             @Override
             public void onSubscribe(Subscription s) {
                 ts.onSubscribe(s);
@@ -131,7 +131,7 @@ public class HalfSerializerSubscriberTest {
 
         final TestSubscriber ts = new TestSubscriber();
 
-        Subscriber s = new Subscriber() {
+        FlowableSubscriber s = new FlowableSubscriber() {
             @Override
             public void onSubscribe(Subscription s) {
                 ts.onSubscribe(s);
@@ -175,7 +175,7 @@ public class HalfSerializerSubscriberTest {
 
         final TestSubscriber ts = new TestSubscriber();
 
-        Subscriber s = new Subscriber() {
+        FlowableSubscriber s = new FlowableSubscriber() {
             @Override
             public void onSubscribe(Subscription s) {
                 ts.onSubscribe(s);

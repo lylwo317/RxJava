@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -34,7 +34,7 @@ import io.reactivex.plugins.RxJavaPlugins;
  */
 public final class FlowableFlatMapCompletableCompletable<T> extends Completable implements FuseToFlowable<T> {
 
-    final Publisher<T> source;
+    final Flowable<T> source;
 
     final Function<? super T, ? extends CompletableSource> mapper;
 
@@ -42,7 +42,7 @@ public final class FlowableFlatMapCompletableCompletable<T> extends Completable 
 
     final boolean delayErrors;
 
-    public FlowableFlatMapCompletableCompletable(Publisher<T> source,
+    public FlowableFlatMapCompletableCompletable(Flowable<T> source,
             Function<? super T, ? extends CompletableSource> mapper, boolean delayErrors,
             int maxConcurrency) {
         this.source = source;
@@ -62,7 +62,7 @@ public final class FlowableFlatMapCompletableCompletable<T> extends Completable 
     }
 
     static final class FlatMapCompletableMainSubscriber<T> extends AtomicInteger
-    implements Subscriber<T>, Disposable {
+    implements FlowableSubscriber<T>, Disposable {
         private static final long serialVersionUID = 8443155186132538303L;
 
         final CompletableObserver actual;
@@ -124,9 +124,9 @@ public final class FlowableFlatMapCompletableCompletable<T> extends Completable 
 
             InnerObserver inner = new InnerObserver();
 
-            set.add(inner);
-
-            cs.subscribe(inner);
+            if (set.add(inner)) {
+                cs.subscribe(inner);
+            }
         }
 
         @Override

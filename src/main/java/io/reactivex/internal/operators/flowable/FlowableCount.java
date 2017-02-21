@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,11 +15,12 @@ package io.reactivex.internal.operators.flowable;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.internal.subscriptions.*;
 
 public final class FlowableCount<T> extends AbstractFlowableWithUpstream<T, Long> {
 
-    public FlowableCount(Publisher<T> source) {
+    public FlowableCount(Flowable<T> source) {
         super(source);
     }
 
@@ -29,7 +30,7 @@ public final class FlowableCount<T> extends AbstractFlowableWithUpstream<T, Long
     }
 
     static final class CountSubscriber extends DeferredScalarSubscription<Long>
-    implements Subscriber<Object> {
+    implements FlowableSubscriber<Object> {
 
 
         private static final long serialVersionUID = 4973004223787171406L;

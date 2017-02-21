@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -721,7 +721,7 @@ public class FlowableSingleTest {
                 }
             }).singleElement().test().assertComplete();
 
-            assertSame(exception, error.get());
+            assertSame(exception, error.get().getCause());
         } finally {
             RxJavaPlugins.reset();
         }

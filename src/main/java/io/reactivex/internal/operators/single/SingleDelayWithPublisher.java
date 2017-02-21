@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -42,7 +42,7 @@ public final class SingleDelayWithPublisher<T, U> extends Single<T> {
 
     static final class OtherSubscriber<T, U>
     extends AtomicReference<Disposable>
-    implements Subscriber<U>, Disposable {
+    implements FlowableSubscriber<U>, Disposable {
 
 
         private static final long serialVersionUID = -8565274649390031272L;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -50,10 +50,10 @@ public interface Observer<T> {
      * The {@code Observable} will not call this method again after it calls either {@link #onComplete} or
      * {@link #onError}.
      *
-     * @param value
+     * @param t
      *          the item emitted by the Observable
      */
-    void onNext(T value);
+    void onNext(T t);
 
     /**
      * Notifies the Observer that the {@link Observable} has experienced an error condition.

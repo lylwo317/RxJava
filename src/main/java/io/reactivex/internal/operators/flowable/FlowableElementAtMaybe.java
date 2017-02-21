@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -22,11 +22,11 @@ import io.reactivex.internal.subscriptions.SubscriptionHelper;
 import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableElementAtMaybe<T> extends Maybe<T> implements FuseToFlowable<T> {
-    final Publisher<T> source;
+    final Flowable<T> source;
 
     final long index;
 
-    public FlowableElementAtMaybe(Publisher<T> source, long index) {
+    public FlowableElementAtMaybe(Flowable<T> source, long index) {
         this.source = source;
         this.index = index;
     }
@@ -38,10 +38,10 @@ public final class FlowableElementAtMaybe<T> extends Maybe<T> implements FuseToF
 
     @Override
     public Flowable<T> fuseToFlowable() {
-        return RxJavaPlugins.onAssembly(new FlowableElementAt<T>(source, index, null));
+        return RxJavaPlugins.onAssembly(new FlowableElementAt<T>(source, index, null, false));
     }
 
-    static final class ElementAtSubscriber<T> implements Subscriber<T>, Disposable {
+    static final class ElementAtSubscriber<T> implements FlowableSubscriber<T>, Disposable {
 
         final MaybeObserver<? super T> actual;
 

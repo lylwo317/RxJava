@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.flowables.GroupedFlowable;
 import io.reactivex.functions.Function;
@@ -34,7 +36,7 @@ public final class FlowableGroupBy<T, K, V> extends AbstractFlowableWithUpstream
     final int bufferSize;
     final boolean delayError;
 
-    public FlowableGroupBy(Publisher<T> source, Function<? super T, ? extends K> keySelector, Function<? super T, ? extends V> valueSelector, int bufferSize, boolean delayError) {
+    public FlowableGroupBy(Flowable<T> source, Function<? super T, ? extends K> keySelector, Function<? super T, ? extends V> valueSelector, int bufferSize, boolean delayError) {
         super(source);
         this.keySelector = keySelector;
         this.valueSelector = valueSelector;
@@ -49,7 +51,7 @@ public final class FlowableGroupBy<T, K, V> extends AbstractFlowableWithUpstream
 
     public static final class GroupBySubscriber<T, K, V>
     extends BasicIntQueueSubscription<GroupedFlowable<K, V>>
-    implements Subscriber<T> {
+    implements FlowableSubscriber<T> {
 
         private static final long serialVersionUID = -3688291656102519502L;
 
@@ -353,6 +355,7 @@ public final class FlowableGroupBy<T, K, V> extends AbstractFlowableWithUpstream
             return NONE;
         }
 
+        @Nullable
         @Override
         public GroupedFlowable<K, V> poll() {
             return queue.poll();
@@ -627,6 +630,7 @@ public final class FlowableGroupBy<T, K, V> extends AbstractFlowableWithUpstream
             return NONE;
         }
 
+        @Nullable
         @Override
         public T poll() {
             T v = queue.poll();

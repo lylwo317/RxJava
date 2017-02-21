@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.*;
 
 import io.reactivex.*;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
@@ -33,20 +35,23 @@ import io.reactivex.plugins.RxJavaPlugins;
  */
 public final class ObservableWithLatestFromMany<T, R> extends AbstractObservableWithUpstream<T, R> {
 
+    @Nullable
     final ObservableSource<?>[] otherArray;
 
+    @Nullable
     final Iterable<? extends ObservableSource<?>> otherIterable;
 
+    @NonNull
     final Function<? super Object[], R> combiner;
 
-    public ObservableWithLatestFromMany(ObservableSource<T> source, ObservableSource<?>[] otherArray, Function<? super Object[], R> combiner) {
+    public ObservableWithLatestFromMany(@NonNull ObservableSource<T> source, @NonNull ObservableSource<?>[] otherArray, @NonNull Function<? super Object[], R> combiner) {
         super(source);
         this.otherArray = otherArray;
         this.otherIterable = null;
         this.combiner = combiner;
     }
 
-    public ObservableWithLatestFromMany(ObservableSource<T> source, Iterable<? extends ObservableSource<?>> otherIterable, Function<? super Object[], R> combiner) {
+    public ObservableWithLatestFromMany(@NonNull ObservableSource<T> source, @NonNull Iterable<? extends ObservableSource<?>> otherIterable, @NonNull Function<? super Object[], R> combiner) {
         super(source);
         this.otherArray = null;
         this.otherIterable = otherIterable;

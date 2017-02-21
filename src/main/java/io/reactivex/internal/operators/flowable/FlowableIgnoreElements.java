@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,12 +15,14 @@ package io.reactivex.internal.operators.flowable;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.internal.fuseable.QueueSubscription;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
 
 public final class FlowableIgnoreElements<T> extends AbstractFlowableWithUpstream<T, T> {
 
-    public FlowableIgnoreElements(Publisher<T> source) {
+    public FlowableIgnoreElements(Flowable<T> source) {
         super(source);
     }
 
@@ -29,7 +31,7 @@ public final class FlowableIgnoreElements<T> extends AbstractFlowableWithUpstrea
         source.subscribe(new IgnoreElementsSubscriber<T>(t));
     }
 
-    static final class IgnoreElementsSubscriber<T> implements QueueSubscription<T>, Subscriber<T> {
+    static final class IgnoreElementsSubscriber<T> implements FlowableSubscriber<T>, QueueSubscription<T> {
         final Subscriber<? super T> actual;
 
         Subscription s;
@@ -72,6 +74,7 @@ public final class FlowableIgnoreElements<T> extends AbstractFlowableWithUpstrea
             throw new UnsupportedOperationException("Should not be called!");
         }
 
+        @Nullable
         @Override
         public T poll() {
             return null; // empty, always

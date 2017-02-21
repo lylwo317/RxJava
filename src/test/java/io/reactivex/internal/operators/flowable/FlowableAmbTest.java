@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -655,7 +655,7 @@ public class FlowableAmbTest {
 
             to.assertFailure(TestException.class);
             if (!errors.isEmpty()) {
-                TestHelper.assertError(errors, 0, TestException.class);
+                TestHelper.assertUndeliverable(errors, 0, TestException.class);
             }
         }
     }
@@ -696,5 +696,25 @@ public class FlowableAmbTest {
         }))
         .test()
         .assertFailureAndMessage(TestException.class, "next()");
+    }
+
+    @Test
+    public void ambWithOrder() {
+        Flowable<Integer> error = Flowable.error(new RuntimeException());
+        Flowable.just(1).ambWith(error).test().assertValue(1).assertComplete();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void ambIterableOrder() {
+        Flowable<Integer> error = Flowable.error(new RuntimeException());
+        Flowable.amb(Arrays.asList(Flowable.just(1), error)).test().assertValue(1).assertComplete();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void ambArrayOrder() {
+        Flowable<Integer> error = Flowable.error(new RuntimeException());
+        Flowable.ambArray(Flowable.just(1), error).test().assertValue(1).assertComplete();
     }
 }

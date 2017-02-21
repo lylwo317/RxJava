@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -755,5 +755,33 @@ public class ObservableFlatMapTest {
         TestHelper.assertError(errors, 0, TestException.class);
 
         TestHelper.assertError(errors, 1, TestException.class);
+    }
+
+    @Test
+    public void noCrossBoundaryFusion() {
+        for (int i = 0; i < 500; i++) {
+            TestObserver<Object> ts = Observable.merge(
+                    Observable.just(1).observeOn(Schedulers.single()).map(new Function<Integer, Object>() {
+                        @Override
+                        public Object apply(Integer v) throws Exception {
+                            return Thread.currentThread().getName().substring(0, 4);
+                        }
+                    }),
+                    Observable.just(1).observeOn(Schedulers.computation()).map(new Function<Integer, Object>() {
+                        @Override
+                        public Object apply(Integer v) throws Exception {
+                            return Thread.currentThread().getName().substring(0, 4);
+                        }
+                    })
+            )
+            .test()
+            .awaitDone(5, TimeUnit.SECONDS)
+            .assertValueCount(2);
+
+            List<Object> list = ts.values();
+
+            assertTrue(list.toString(), list.contains("RxSi"));
+            assertTrue(list.toString(), list.contains("RxCo"));
+        }
     }
 }

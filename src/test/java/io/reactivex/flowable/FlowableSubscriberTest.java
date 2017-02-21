@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -88,7 +88,7 @@ public class FlowableSubscriberTest {
         FlowableOperator<String, String> o = new FlowableOperator<String, String>() {
             @Override
             public Subscriber<? super String> apply(final Subscriber<? super String> s1) {
-                return new Subscriber<String>() {
+                return new FlowableSubscriber<String>() {
 
                     @Override
                     public void onSubscribe(Subscription a) {
@@ -140,7 +140,7 @@ public class FlowableSubscriberTest {
         FlowableOperator<String, String> o = new FlowableOperator<String, String>() {
             @Override
             public Subscriber<? super String> apply(final Subscriber<? super String> s1) {
-                return new Subscriber<String>() {
+                return new FlowableSubscriber<String>() {
 
                     @Override
                     public void onSubscribe(Subscription a) {
@@ -722,7 +722,7 @@ public class FlowableSubscriberTest {
 
             s.onComplete();
 
-            TestHelper.assertError(list, 0, TestException.class, "Inner");
+            TestHelper.assertUndeliverable(list, 0, TestException.class, "Inner");
         } finally {
             RxJavaPlugins.reset();
         }

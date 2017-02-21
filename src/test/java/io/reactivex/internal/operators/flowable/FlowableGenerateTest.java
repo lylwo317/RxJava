@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -109,7 +109,7 @@ public class FlowableGenerateTest {
             .test()
             .assertResult();
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -235,5 +235,51 @@ public class FlowableGenerateTest {
 
             ts.assertValueCount(1000);
         }
+    }
+
+    @Test
+    public void multipleOnNext() {
+        Flowable.generate(new Consumer<Emitter<Object>>() {
+            @Override
+            public void accept(Emitter<Object> e) throws Exception {
+                e.onNext(1);
+                e.onNext(2);
+            }
+        })
+        .test(1)
+        .assertFailure(IllegalStateException.class, 1);
+    }
+
+    @Test
+    public void multipleOnError() {
+        List<Throwable> errors = TestHelper.trackPluginErrors();
+        try {
+            Flowable.generate(new Consumer<Emitter<Object>>() {
+                @Override
+                public void accept(Emitter<Object> e) throws Exception {
+                    e.onError(new TestException("First"));
+                    e.onError(new TestException("Second"));
+                }
+            })
+            .test(1)
+            .assertFailure(TestException.class);
+
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    public void multipleOnComplete() {
+        Flowable.generate(new Consumer<Emitter<Object>>() {
+            @Override
+            public void accept(Emitter<Object> e) throws Exception {
+                e.onComplete();
+                e.onComplete();
+            }
+        })
+        .test(1)
+        .assertResult();
     }
 }

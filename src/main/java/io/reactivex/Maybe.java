@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -35,6 +35,8 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Represents a deferred computation and emission of a maybe value or exception.
  * <p>
+ * <img width="640" height="370" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/maybe.png" alt="">
+ * <p>
  * The main consumer type of Maybe is {@link MaybeObserver} whose methods are called
  * in a sequential fashion following this protocol:<br>
  * {@code onSubscribe (onSuccess | onError | onComplete)?}.
@@ -52,9 +54,11 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * <dd>{@code amb} does not operate by default on a particular {@link Scheduler}.</dd>
      * </dl>
      * @param <T> the value type
-     * @param sources the Iterable sequence of sources
+     * @param sources the Iterable sequence of sources. A subscription to each source will
+     *            occur in the same order as in the Iterable.
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> amb(final Iterable<? extends MaybeSource<? extends T>> sources) {
         ObjectHelper.requireNonNull(sources, "sources is null");
@@ -69,9 +73,11 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * <dd>{@code ambArray} does not operate by default on a particular {@link Scheduler}.</dd>
      * </dl>
      * @param <T> the value type
-     * @param sources the array of sources
+     * @param sources the array of sources. A subscription to each source will
+     *            occur in the same order as in the array.
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Maybe<T> ambArray(final MaybeSource<? extends T>... sources) {
@@ -98,6 +104,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concat(Iterable<? extends MaybeSource<? extends T>> sources) {
         ObjectHelper.requireNonNull(sources, "sources is null");
@@ -107,7 +114,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Returns a Flowable that emits the items emitted by two MaybeSources, one after the other.
      * <p>
-     * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.concat.png" alt="">
+     * <img width="640" height="422" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.concat.png" alt="">
      * <dl>
      *  <dt><b>Backpressure:</b><dt>
      *  <dd>The returned {@code Flowable} honors the backpressure of the downstream consumer.</dd>
@@ -124,6 +131,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/concat.html">ReactiveX operators documentation: Concat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> concat(MaybeSource<? extends T> source1, MaybeSource<? extends T> source2) {
@@ -135,7 +143,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Returns a Flowable that emits the items emitted by three MaybeSources, one after the other.
      * <p>
-     * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.concat.png" alt="">
+     * <img width="640" height="422" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.concat.png" alt="">
      * <dl>
      *  <dt><b>Backpressure:</b><dt>
      *  <dd>The returned {@code Flowable} honors the backpressure of the downstream consumer.</dd>
@@ -154,6 +162,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/concat.html">ReactiveX operators documentation: Concat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> concat(
@@ -167,7 +176,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Returns a Flowable that emits the items emitted by four MaybeSources, one after the other.
      * <p>
-     * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.concat.png" alt="">
+     * <img width="640" height="422" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.concat.png" alt="">
      * <dl>
      *  <dt><b>Backpressure:</b><dt>
      *  <dd>The returned {@code Flowable} honors the backpressure of the downstream consumer.</dd>
@@ -188,6 +197,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/concat.html">ReactiveX operators documentation: Concat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> concat(
@@ -215,6 +225,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concat(Publisher<? extends MaybeSource<? extends T>> sources) {
         return concat(sources, 2);
@@ -237,12 +248,13 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Flowable<T> concat(Publisher<? extends MaybeSource<? extends T>> sources, int prefetch) {
         ObjectHelper.requireNonNull(sources, "sources is null");
         ObjectHelper.verifyPositive(prefetch, "prefetch");
-        return RxJavaPlugins.onAssembly(new FlowableConcatMap(sources, MaybeToPublisher.instance(), prefetch, ErrorMode.IMMEDIATE));
+        return RxJavaPlugins.onAssembly(new FlowableConcatMapPublisher(sources, MaybeToPublisher.instance(), prefetch, ErrorMode.IMMEDIATE));
     }
 
     /**
@@ -258,6 +270,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> concatArray(MaybeSource<? extends T>... sources) {
@@ -289,6 +302,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings("unchecked")
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concatArrayDelayError(MaybeSource<? extends T>... sources) {
         if (sources.length == 0) {
@@ -318,6 +332,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concatArrayEager(MaybeSource<? extends T>... sources) {
         return Flowable.fromArray(sources).concatMapEager((Function)MaybeToPublisher.instance());
@@ -340,6 +355,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concatDelayError(Iterable<? extends MaybeSource<? extends T>> sources) {
         ObjectHelper.requireNonNull(sources, "sources is null");
@@ -363,6 +379,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concatDelayError(Publisher<? extends MaybeSource<? extends T>> sources) {
         return Flowable.fromPublisher(sources).concatMapDelayError((Function)MaybeToPublisher.instance());
@@ -386,6 +403,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concatEager(Iterable<? extends MaybeSource<? extends T>> sources) {
         return Flowable.fromIterable(sources).concatMapEager((Function)MaybeToPublisher.instance());
@@ -411,6 +429,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> concatEager(Publisher<? extends MaybeSource<? extends T>> sources) {
         return Flowable.fromPublisher(sources).concatMapEager((Function)MaybeToPublisher.instance());
@@ -455,6 +474,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see MaybeOnSubscribe
      * @see Cancellable
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> create(MaybeOnSubscribe<T> onSubscribe) {
         ObjectHelper.requireNonNull(onSubscribe, "onSubscribe is null");
@@ -473,6 +493,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * returns a MaybeSource instance to subscribe to
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> defer(final Callable<? extends MaybeSource<? extends T>> maybeSupplier) {
         ObjectHelper.requireNonNull(maybeSupplier, "maybeSupplier is null");
@@ -491,6 +512,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param <T> the value type
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Maybe<T> empty() {
@@ -501,7 +523,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Returns a Maybe that invokes a subscriber's {@link MaybeObserver#onError onError} method when the
      * subscriber subscribes to it.
      * <p>
-     * <img width="640" height="190" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.error.png" alt="">
+     * <img width="640" height="447" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.error.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code error} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -515,6 +537,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         the subscriber subscribes to it
      * @see <a href="http://reactivex.io/documentation/operators/empty-never-throw.html">ReactiveX operators documentation: Throw</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> error(Throwable exception) {
         ObjectHelper.requireNonNull(exception, "exception is null");
@@ -539,6 +562,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         the MaybeObserver subscribes to it
      * @see <a href="http://reactivex.io/documentation/operators/empty-never-throw.html">ReactiveX operators documentation: Throw</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> error(Callable<? extends Throwable> supplier) {
         ObjectHelper.requireNonNull(supplier, "errorSupplier is null");
@@ -557,6 +581,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @throws NullPointerException if run is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromAction(final Action run) {
         ObjectHelper.requireNonNull(run, "run is null");
@@ -575,6 +600,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @throws NullPointerException if completable is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromCompletable(CompletableSource completableSource) {
         ObjectHelper.requireNonNull(completableSource, "completableSource is null");
@@ -593,6 +619,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @throws NullPointerException if single is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromSingle(SingleSource<T> singleSource) {
         ObjectHelper.requireNonNull(singleSource, "singleSource is null");
@@ -617,6 +644,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         the type of the item emitted by the {@link Maybe}.
      * @return a {@link Maybe} whose {@link MaybeObserver}s' subscriptions trigger an invocation of the given function.
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromCallable(final Callable<? extends T> callable) {
         ObjectHelper.requireNonNull(callable, "callable is null");
@@ -649,6 +677,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits the item from the source {@link Future}
      * @see <a href="http://reactivex.io/documentation/operators/from.html">ReactiveX operators documentation: From</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromFuture(Future<? extends T> future) {
         ObjectHelper.requireNonNull(future, "future is null");
@@ -685,6 +714,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits the item from the source {@link Future}
      * @see <a href="http://reactivex.io/documentation/operators/from.html">ReactiveX operators documentation: From</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromFuture(Future<? extends T> future, long timeout, TimeUnit unit) {
         ObjectHelper.requireNonNull(future, "future is null");
@@ -704,6 +734,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @throws NullPointerException if run is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> fromRunnable(final Runnable run) {
         ObjectHelper.requireNonNull(run, "run is null");
@@ -714,7 +745,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Returns a {@code Maybe} that emits a specified item.
      * <p>
-     * <img width="640" height="310" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.just.png" alt="">
+     * <img width="640" height="485" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.just.png" alt="">
      * <p>
      * To convert any object into a {@code Maybe} that emits that object, pass that object into the
      * {@code just} method.
@@ -730,6 +761,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a {@code Maybe} that emits {@code item}
      * @see <a href="http://reactivex.io/documentation/operators/just.html">ReactiveX operators documentation: Just</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> just(T item) {
         ObjectHelper.requireNonNull(item, "item is null");
@@ -750,6 +782,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> merge(Iterable<? extends MaybeSource<? extends T>> sources) {
         return merge(Flowable.fromIterable(sources));
@@ -769,6 +802,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> merge(Publisher<? extends MaybeSource<? extends T>> sources) {
         return merge(sources, Integer.MAX_VALUE);
@@ -789,17 +823,18 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Flowable<T> merge(Publisher<? extends MaybeSource<? extends T>> sources, int maxConcurrency) {
-        return RxJavaPlugins.onAssembly(new FlowableFlatMap(sources, MaybeToPublisher.instance(), false, maxConcurrency, Flowable.bufferSize()));
+        return RxJavaPlugins.onAssembly(new FlowableFlatMapPublisher(sources, MaybeToPublisher.instance(), false, maxConcurrency, Flowable.bufferSize()));
     }
 
     /**
      * Flattens a {@code MaybeSource} that emits a {@code MaybeSource} into a single {@code MaybeSource} that emits the item
      * emitted by the nested {@code MaybeSource}, without any transformation.
      * <p>
-     * <img width="640" height="370" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.oo.png" alt="">
+     * <img width="640" height="393" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.oo.png" alt="">
      * <p>
      * <dl>
      * <dt><b>Scheduler:</b></dt>
@@ -813,6 +848,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         by {@code source}
      * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators documentation: Merge</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static <T> Maybe<T> merge(MaybeSource<? extends MaybeSource<? extends T>> source) {
@@ -822,7 +858,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Flattens two MaybeSources into a single Flowable, without any transformation.
      * <p>
-     * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.png" alt="">
+     * <img width="640" height="483" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.png" alt="">
      * <p>
      * You can combine items emitted by multiple MaybeSources so that they appear as a single Flowable, by
      * using the {@code merge} method.
@@ -842,6 +878,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators documentation: Merge</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> merge(
@@ -855,7 +892,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Flattens three MaybeSources into a single Flowable, without any transformation.
      * <p>
-     * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.png" alt="">
+     * <img width="640" height="483" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.png" alt="">
      * <p>
      * You can combine items emitted by multiple MaybeSources so that they appear as a single Flowable, by using
      * the {@code merge} method.
@@ -877,6 +914,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators documentation: Merge</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> merge(
@@ -892,7 +930,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Flattens four MaybeSources into a single Flowable, without any transformation.
      * <p>
-     * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.png" alt="">
+     * <img width="640" height="483" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.merge.png" alt="">
      * <p>
      * You can combine items emitted by multiple MaybeSources so that they appear as a single Flowable, by using
      * the {@code merge} method.
@@ -916,6 +954,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators documentation: Merge</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> merge(
@@ -943,6 +982,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Flowable instance
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Flowable<T> mergeArray(MaybeSource<? extends T>... sources) {
@@ -985,6 +1025,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> mergeArrayDelayError(MaybeSource<? extends T>... sources) {
         return Flowable.fromArray(sources).flatMap((Function)MaybeToPublisher.instance(), true, sources.length);
@@ -1020,6 +1061,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> mergeDelayError(Iterable<? extends MaybeSource<? extends T>> sources) {
         return Flowable.fromIterable(sources).flatMap((Function)MaybeToPublisher.instance(), true);
@@ -1056,6 +1098,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> mergeDelayError(Publisher<? extends MaybeSource<? extends T>> sources) {
         return Flowable.fromPublisher(sources).flatMap((Function)MaybeToPublisher.instance(), true);
@@ -1091,6 +1134,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> mergeDelayError(MaybeSource<? extends T> source1, MaybeSource<? extends T> source2) {
         ObjectHelper.requireNonNull(source1, "source1 is null");
@@ -1131,6 +1175,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> mergeDelayError(MaybeSource<? extends T> source1,
             MaybeSource<? extends T> source2, MaybeSource<? extends T> source3) {
@@ -1176,6 +1221,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings({ "unchecked" })
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Flowable<T> mergeDelayError(
             MaybeSource<? extends T> source1, MaybeSource<? extends T> source2,
@@ -1203,6 +1249,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that never emits any items or sends any notifications to a {@link MaybeObserver}
      * @see <a href="http://reactivex.io/documentation/operators/empty-never-throw.html">ReactiveX operators documentation: Never</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @SuppressWarnings("unchecked")
     public static <T> Maybe<T> never() {
@@ -1229,6 +1276,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Single that emits a Boolean value that indicates whether the two sequences are the same
      * @see <a href="http://reactivex.io/documentation/operators/sequenceequal.html">ReactiveX operators documentation: SequenceEqual</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Single<Boolean> sequenceEqual(MaybeSource<? extends T> source1, MaybeSource<? extends T> source2) {
         return sequenceEqual(source1, source2, ObjectHelper.equalsPredicate());
@@ -1257,6 +1305,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         are the same according to the specified function
      * @see <a href="http://reactivex.io/documentation/operators/sequenceequal.html">ReactiveX operators documentation: SequenceEqual</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Single<Boolean> sequenceEqual(MaybeSource<? extends T> source1, MaybeSource<? extends T> source2,
             BiPredicate<? super T, ? super T> isEqual) {
@@ -1279,6 +1328,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits {@code 0L} after a specified delay
      * @see <a href="http://reactivex.io/documentation/operators/timer.html">ReactiveX operators documentation: Timer</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.COMPUTATION)
     public static Maybe<Long> timer(long delay, TimeUnit unit) {
         return timer(delay, unit, Schedulers.computation());
@@ -1302,6 +1352,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits {@code 0L} after a specified delay, on a specified Scheduler
      * @see <a href="http://reactivex.io/documentation/operators/timer.html">ReactiveX operators documentation: Timer</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public static Maybe<Long> timer(long delay, TimeUnit unit, Scheduler scheduler) {
         ObjectHelper.requireNonNull(unit, "unit is null");
@@ -1321,6 +1372,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param onSubscribe the function that is called with the subscribing MaybeObserver
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> unsafeCreate(MaybeSource<T> onSubscribe) {
         if (onSubscribe instanceof Maybe) {
@@ -1351,6 +1403,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Maybe whose lifetime controls the lifetime of the dependent resource object
      * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators documentation: Using</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T, D> Maybe<T> using(Callable<? extends D> resourceSupplier,
             Function<? super D, ? extends MaybeSource<? extends T>> sourceSupplier,
@@ -1385,6 +1438,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Maybe whose lifetime controls the lifetime of the dependent resource object
      * @see <a href="http://reactivex.io/documentation/operators/using.html">ReactiveX operators documentation: Using</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T, D> Maybe<T> using(Callable<? extends D> resourceSupplier,
             Function<? super D, ? extends MaybeSource<? extends T>> sourceSupplier,
@@ -1406,6 +1460,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param source the source to wrap
      * @return the Maybe wrapper or the source cast to Maybe (if possible)
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T> Maybe<T> wrap(MaybeSource<T> source) {
         if (source instanceof Maybe) {
@@ -1442,6 +1497,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits the zipped results
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T, R> Maybe<R> zip(Iterable<? extends MaybeSource<? extends T>> sources, Function<? super Object[], ? extends R> zipper) {
         ObjectHelper.requireNonNull(zipper, "zipper is null");
@@ -1475,6 +1531,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2,
@@ -1513,6 +1570,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1555,6 +1613,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, T4, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1602,6 +1661,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, T4, T5, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1653,6 +1713,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, T4, T5, T6, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1708,6 +1769,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, T4, T5, T6, T7, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1768,6 +1830,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, T4, T5, T6, T7, T8, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1832,6 +1895,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T1, T2, T3, T4, T5, T6, T7, T8, T9, R> Maybe<R> zip(
             MaybeSource<? extends T1> source1, MaybeSource<? extends T2> source2, MaybeSource<? extends T3> source3,
@@ -1878,6 +1942,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits the zipped results
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public static <T, R> Maybe<R> zipArray(Function<? super Object[], ? extends R> zipper,
             MaybeSource<? extends T>... sources) {
@@ -1903,12 +1968,14 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * </dl>
      *
      * @param other
-     *            a MaybeSource competing to react first
+     *            a MaybeSource competing to react first. A subscription to this provided source will occur after
+     *            subscribing to the current source.
      * @return a Maybe that emits the same sequence as whichever of the source MaybeSources first
      *         signalled
      * @see <a href="http://reactivex.io/documentation/operators/amb.html">ReactiveX operators documentation: Amb</a>
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> ambWith(MaybeSource<? extends T> other) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -1924,6 +1991,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * </dl>
      * @return the success value
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final T blockingGet() {
         BlockingMultiObserver<T> observer = new BlockingMultiObserver<T>();
@@ -1941,6 +2009,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param defaultValue the default item to return if this Maybe is empty
      * @return the success value
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final T blockingGet(T defaultValue) {
         ObjectHelper.requireNonNull(defaultValue, "defaultValue is null");
@@ -1968,6 +2037,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         benefit of subsequent subscribers
      * @see <a href="http://reactivex.io/documentation/operators/replay.html">ReactiveX operators documentation: Replay</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> cache() {
         return RxJavaPlugins.onAssembly(new MaybeCache<T>(this));
@@ -1984,6 +2054,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param clazz the type token to use for casting the success result from the current Maybe
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<U> cast(final Class<? extends U> clazz) {
         ObjectHelper.requireNonNull(clazz, "clazz is null");
@@ -2008,16 +2079,18 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe, transformed by the transformer function
      * @see <a href="https://github.com/ReactiveX/RxJava/wiki/Implementing-Your-Own-Operators">RxJava wiki: Implementing Your Own Operators</a>
      */
+    @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
-    public final <R> Maybe<R> compose(MaybeTransformer<T, R> transformer) {
-        return wrap(transformer.apply(this));
+    public final <R> Maybe<R> compose(MaybeTransformer<? super T, ? extends R> transformer) {
+        return wrap(((MaybeTransformer<T, R>) transformer).apply(this));
     }
 
     /**
      * Returns a Maybe that is based on applying a specified function to the item emitted by the source Maybe,
      * where that function returns a MaybeSource.
      * <p>
-     * <img width="640" height="300" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMap.png" alt="">
+     * <img width="640" height="356" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMap.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code concatMap} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2029,6 +2102,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Maybe returned from {@code func} when applied to the item emitted by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Maybe<R> concatMap(Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
         ObjectHelper.requireNonNull(mapper, "mapper is null");
@@ -2055,6 +2129,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/concat.html">ReactiveX operators documentation: Concat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> concatWith(MaybeSource<? extends T> other) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -2077,6 +2152,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         or {@code false} if the source Maybe completes without emitting that item
      * @see <a href="http://reactivex.io/documentation/operators/contains.html">ReactiveX operators documentation: Contains</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Single<Boolean> contains(final Object item) {
         ObjectHelper.requireNonNull(item, "item is null");
@@ -2098,6 +2174,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/count.html">ReactiveX operators documentation: Count</a>
      * @see #count()
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Single<Long> count() {
         return RxJavaPlugins.onAssembly(new MaybeCount<T>(this));
@@ -2119,6 +2196,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         items, or the items emitted by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/defaultifempty.html">ReactiveX operators documentation: DefaultIfEmpty</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> defaultIfEmpty(T defaultItem) {
         ObjectHelper.requireNonNull(defaultItem, "item is null");
@@ -2143,6 +2221,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.COMPUTATION)
     public final Maybe<T> delay(long delay, TimeUnit unit) {
         return delay(delay, unit, Schedulers.computation());
@@ -2167,6 +2246,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> delay(long delay, TimeUnit unit, Scheduler scheduler) {
         ObjectHelper.requireNonNull(unit, "unit is null");
@@ -2197,6 +2277,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @BackpressureSupport(BackpressureKind.UNBOUNDED_IN)
     public final <U, V> Maybe<T> delay(Publisher<U> delayIndicator) {
@@ -2221,6 +2302,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         until the other Publisher emits an element or completes normally.
      */
     @BackpressureSupport(BackpressureKind.UNBOUNDED_IN)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> delaySubscription(Publisher<U> subscriptionIndicator) {
         ObjectHelper.requireNonNull(subscriptionIndicator, "subscriptionIndicator is null");
@@ -2243,6 +2325,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that delays the subscription to the source Maybe by the given amount
      * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.COMPUTATION)
     public final Maybe<T> delaySubscription(long delay, TimeUnit unit) {
         return delaySubscription(delay, unit, Schedulers.computation());
@@ -2268,6 +2351,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         amount, waiting and subscribing on the given Scheduler
      * @see <a href="http://reactivex.io/documentation/operators/delay.html">ReactiveX operators documentation: Delay</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> delaySubscription(long delay, TimeUnit unit, Scheduler scheduler) {
         return delaySubscription(Flowable.timer(delay, unit, scheduler));
@@ -2285,6 +2369,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @since 2.0.1 - experimental
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @Experimental
     public final Maybe<T> doAfterSuccess(Consumer<? super T> onAfterSuccess) {
@@ -2309,6 +2394,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         {@link Action}
      * @see <a href="http://reactivex.io/documentation/operators/do.html">ReactiveX operators documentation: Do</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doAfterTerminate(Action onAfterTerminate) {
         return RxJavaPlugins.onAssembly(new MaybePeek<T>(this,
@@ -2336,6 +2422,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @since 2.0.1 - experimental
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @Experimental
     public final Maybe<T> doFinally(Action onFinally) {
@@ -2353,6 +2440,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param onDispose the runnable called when the subscription is cancelled (disposed)
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doOnDispose(Action onDispose) {
         return RxJavaPlugins.onAssembly(new MaybePeek<T>(this,
@@ -2379,6 +2467,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe with the side-effecting behavior applied
      * @see <a href="http://reactivex.io/documentation/operators/do.html">ReactiveX operators documentation: Do</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doOnComplete(Action onComplete) {
         return RxJavaPlugins.onAssembly(new MaybePeek<T>(this,
@@ -2401,6 +2490,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param onError the consumer called with the success value of onError
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doOnError(Consumer<? super Throwable> onError) {
         return RxJavaPlugins.onAssembly(new MaybePeek<T>(this,
@@ -2427,6 +2517,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param onEvent the callback to call with the terminal event tuple
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doOnEvent(BiConsumer<? super T, ? super Throwable> onEvent) {
         ObjectHelper.requireNonNull(onEvent, "onEvent is null");
@@ -2443,6 +2534,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param onSubscribe the consumer called with the Disposable sent via onSubscribe
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doOnSubscribe(Consumer<? super Disposable> onSubscribe) {
         return RxJavaPlugins.onAssembly(new MaybePeek<T>(this,
@@ -2465,6 +2557,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param onSuccess the consumer called with the success value of onSuccess
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> doOnSuccess(Consumer<? super T> onSuccess) {
         return RxJavaPlugins.onAssembly(new MaybePeek<T>(this,
@@ -2494,6 +2587,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         evaluates as {@code true}
      * @see <a href="http://reactivex.io/documentation/operators/filter.html">ReactiveX operators documentation: Filter</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> filter(Predicate<? super T> predicate) {
         ObjectHelper.requireNonNull(predicate, "predicate is null");
@@ -2504,7 +2598,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Returns a Maybe that is based on applying a specified function to the item emitted by the source Maybe,
      * where that function returns a MaybeSource.
      * <p>
-     * <img width="640" height="300" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMap.png" alt="">
+     * <img width="640" height="356" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMap.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code flatMap} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2517,6 +2611,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Maybe returned from {@code func} when applied to the item emitted by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Maybe<R> flatMap(Function<? super T, ? extends MaybeSource<? extends R>> mapper) {
         ObjectHelper.requireNonNull(mapper, "mapper is null");
@@ -2544,6 +2639,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Maybe<R> flatMap(
             Function<? super T, ? extends MaybeSource<? extends R>> onSuccessMapper,
@@ -2577,6 +2673,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U, R> Maybe<R> flatMap(Function<? super T, ? extends MaybeSource<? extends U>> mapper,
             BiFunction<? super T, ? super U, ? extends R> resultSelector) {
@@ -2604,9 +2701,10 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Flowable<U> flattenAsFlowable(final Function<? super T, ? extends Iterable<? extends U>> mapper) {
-        return new MaybeFlatMapIterableFlowable<T, U>(this, mapper);
+        return RxJavaPlugins.onAssembly(new MaybeFlatMapIterableFlowable<T, U>(this, mapper));
     }
 
     /**
@@ -2626,16 +2724,17 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Observable instance
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Observable<U> flattenAsObservable(final Function<? super T, ? extends Iterable<? extends U>> mapper) {
-        return new MaybeFlatMapIterableObservable<T, U>(this, mapper);
+        return RxJavaPlugins.onAssembly(new MaybeFlatMapIterableObservable<T, U>(this, mapper));
     }
 
     /**
      * Returns an Observable that is based on applying a specified function to the item emitted by the source Maybe,
      * where that function returns an ObservableSource.
      * <p>
-     * <img width="640" height="300" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMap.png" alt="">
+     * <img width="640" height="356" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMap.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code flatMapObservable} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2647,6 +2746,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Observable returned from {@code func} when applied to the item emitted by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Observable<R> flatMapObservable(Function<? super T, ? extends ObservableSource<? extends R>> mapper) {
         return toObservable().flatMap(mapper);
@@ -2656,7 +2756,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Returns a Flowable that emits items based on applying a specified function to the item emitted by the
      * source Maybe, where that function returns a Publisher.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapPublisher.png" alt="">
+     * <img width="640" height="260" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapPublisher.png" alt="">
      * <dl>
      *  <dt><b>Backpressure:</b></dt>
      *  <dd>The returned Flowable honors the downstream backpressure.</dd>
@@ -2672,6 +2772,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Flowable<R> flatMapPublisher(Function<? super T, ? extends Publisher<? extends R>> mapper) {
         return toFlowable().flatMap(mapper);
@@ -2682,7 +2783,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * source {@link Maybe}, where that function returns a {@link Single}.
      * When this Maybe completes a {@link NoSuchElementException} will be thrown.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapSingle.png" alt="">
+     * <img width="640" height="356" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapSingle.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code flatMapSingle} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2695,6 +2796,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Single returned from {@code mapper} when applied to the item emitted by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Single<R> flatMapSingle(final Function<? super T, ? extends SingleSource<? extends R>> mapper) {
         ObjectHelper.requireNonNull(mapper, "mapper is null");
@@ -2706,7 +2808,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * source {@link Maybe}, where that function returns a {@link Single}.
      * When this Maybe just completes the resulting {@code Maybe} completes as well.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapSingle.png" alt="">
+     * <img width="640" height="356" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapSingle.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code flatMapSingleElement} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2720,6 +2822,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      * @since 2.0.2 - experimental
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     @Experimental
     public final <R> Maybe<R> flatMapSingleElement(final Function<? super T, ? extends SingleSource<? extends R>> mapper) {
@@ -2731,7 +2834,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Returns a {@link Completable} that completes based on applying a specified function to the item emitted by the
      * source {@link Maybe}, where that function returns a {@link Completable}.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapCompletable.png" alt="">
+     * <img width="640" height="267" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.flatMapCompletable.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code flatMapCompletable} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2743,8 +2846,9 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the Completable returned from {@code mapper} when applied to the item emitted by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/flatmap.html">ReactiveX operators documentation: FlatMap</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
-    public final Completable flatMapCompletable(final Function<? super T, ? extends Completable> mapper) {
+    public final Completable flatMapCompletable(final Function<? super T, ? extends CompletableSource> mapper) {
         ObjectHelper.requireNonNull(mapper, "mapper is null");
         return RxJavaPlugins.onAssembly(new MaybeFlatMapCompletable<T>(this, mapper));
     }
@@ -2759,6 +2863,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * </dl>
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> hide() {
         return RxJavaPlugins.onAssembly(new MaybeHide<T>(this));
@@ -2777,6 +2882,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *         called by the source Maybe
      * @see <a href="http://reactivex.io/documentation/operators/ignoreelements.html">ReactiveX operators documentation: IgnoreElements</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Completable ignoreElement() {
         return RxJavaPlugins.onAssembly(new MaybeIgnoreElementCompletable<T>(this));
@@ -2794,6 +2900,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Single that emits a Boolean
      * @see <a href="http://reactivex.io/documentation/operators/contains.html">ReactiveX operators documentation: Contains</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Single<Boolean> isEmpty() {
         return RxJavaPlugins.onAssembly(new MaybeIsEmptySingle<T>(this));
@@ -2822,6 +2929,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that is the result of applying the lifted Operator to the source Maybe
      * @see <a href="https://github.com/ReactiveX/RxJava/wiki/Implementing-Your-Own-Operators">RxJava wiki: Implementing Your Own Operators</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Maybe<R> lift(final MaybeOperator<? extends R, ? super T> lift) {
         ObjectHelper.requireNonNull(lift, "onLift is null");
@@ -2832,7 +2940,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Returns a Maybe that applies a specified function to the item emitted by the source Maybe and
      * emits the result of this function application.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.map.png" alt="">
+     * <img width="640" height="515" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.map.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>{@code map} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -2844,6 +2952,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits the item from the source Maybe, transformed by the specified function
      * @see <a href="http://reactivex.io/documentation/operators/map.html">ReactiveX operators documentation: Map</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> Maybe<R> map(Function<? super T, ? extends R> mapper) {
         ObjectHelper.requireNonNull(mapper, "mapper is null");
@@ -2870,6 +2979,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/merge.html">ReactiveX operators documentation: Merge</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> mergeWith(MaybeSource<? extends T> other) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -2880,7 +2990,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Wraps a Maybe to emit its item (or notify of its error) on a specified {@link Scheduler},
      * asynchronously.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.observeOn.png" alt="">
+     * <img width="640" height="182" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.observeOn.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>you specify which {@link Scheduler} this operator will use</dd>
@@ -2894,6 +3004,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://www.grahamlea.com/2014/07/rxjava-threading-examples/">RxJava Threading Examples</a>
      * @see #subscribeOn
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> observeOn(final Scheduler scheduler) {
         ObjectHelper.requireNonNull(scheduler, "scheduler is null");
@@ -2916,6 +3027,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/filter.html">ReactiveX operators documentation: Filter</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<U> ofType(final Class<U> clazz) {
         ObjectHelper.requireNonNull(clazz, "clazz is null");
@@ -2935,6 +3047,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *
      * @return the value returned by the convert function
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <R> R to(Function<? super Maybe<T>, R> convert) {
         try {
@@ -2958,6 +3071,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SuppressWarnings("unchecked")
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> toFlowable() {
         if (this instanceof FuseToFlowable) {
@@ -2976,6 +3090,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Observable instance
      */
     @SuppressWarnings("unchecked")
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Observable<T> toObservable() {
         if (this instanceof FuseToObservable) {
@@ -2994,6 +3109,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param defaultValue the default item to signal in Single if this Maybe is empty
      * @return the new Single instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Single<T> toSingle(T defaultValue) {
         ObjectHelper.requireNonNull(defaultValue, "defaultValue is null");
@@ -3009,6 +3125,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * </dl>
      * @return the new Single instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Single<T> toSingle() {
         return RxJavaPlugins.onAssembly(new MaybeToSingle<T>(this, null));
@@ -3023,6 +3140,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * </dl>
      * @return the new Completable instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onErrorComplete() {
         return onErrorComplete(Functions.alwaysTrue());
@@ -3039,6 +3157,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * if the Throwable should be swallowed and replaced with an onComplete.
      * @return the new Completable instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onErrorComplete(final Predicate<? super Throwable> predicate) {
         ObjectHelper.requireNonNull(predicate, "predicate is null");
@@ -3065,6 +3184,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators documentation: Catch</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onErrorResumeNext(final MaybeSource<? extends T> next) {
         ObjectHelper.requireNonNull(next, "next is null");
@@ -3090,6 +3210,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators documentation: Catch</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onErrorResumeNext(Function<? super Throwable, ? extends MaybeSource<? extends T>> resumeFunction) {
         ObjectHelper.requireNonNull(resumeFunction, "resumeFunction is null");
@@ -3115,6 +3236,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators documentation: Catch</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onErrorReturn(Function<? super Throwable, ? extends T> valueSupplier) {
         ObjectHelper.requireNonNull(valueSupplier, "valueSupplier is null");
@@ -3139,6 +3261,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators documentation: Catch</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onErrorReturnItem(final T item) {
         ObjectHelper.requireNonNull(item, "item is null");
@@ -3152,7 +3275,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * This differs from {@link #onErrorResumeNext} in that this one does not handle {@link java.lang.Throwable}
      * or {@link java.lang.Error} but lets those continue through.
      * <p>
-     * <img width="640" height="310" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/onExceptionResumeNextViaMaybe.png" alt="">
+     * <img width="640" height="333" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/onExceptionResumeNextViaMaybe.png" alt="">
      * <p>
      * You can use this to prevent exceptions from propagating or to supply fallback data should exceptions be
      * encountered.
@@ -3167,6 +3290,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/catch.html">ReactiveX operators documentation: Catch</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onExceptionResumeNext(final MaybeSource<? extends T> next) {
         ObjectHelper.requireNonNull(next, "next is null");
@@ -3182,6 +3306,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe which out references to the upstream producer and downstream MaybeObserver if
      * the sequence is terminated or downstream calls dispose()
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> onTerminateDetach() {
         return RxJavaPlugins.onAssembly(new MaybeDetach<T>(this));
@@ -3202,6 +3327,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/repeat.html">ReactiveX operators documentation: Repeat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> repeat() {
         return repeat(Long.MAX_VALUE);
@@ -3229,6 +3355,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/repeat.html">ReactiveX operators documentation: Repeat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> repeat(long times) {
         return toFlowable().repeat(times);
@@ -3255,6 +3382,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/repeat.html">ReactiveX operators documentation: Repeat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> repeatUntil(BooleanSupplier stop) {
         return toFlowable().repeatUntil(stop);
@@ -3283,6 +3411,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/repeat.html">ReactiveX operators documentation: Repeat</a>
      */
     @BackpressureSupport(BackpressureKind.FULL)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Flowable<T> repeatWhen(final Function<? super Flowable<Object>, ? extends Publisher<?>> handler) {
         return toFlowable().repeatWhen(handler);
@@ -3305,6 +3434,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the nww Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators documentation: Retry</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retry() {
         return retry(Long.MAX_VALUE, Functions.alwaysTrue());
@@ -3327,6 +3457,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see #retry()
      * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators documentation: Retry</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retry(BiPredicate<? super Integer, ? super Throwable> predicate) {
         return toFlowable().retry(predicate).singleElement();
@@ -3351,6 +3482,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators documentation: Retry</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retry(long count) {
         return retry(count, Functions.alwaysTrue());
@@ -3367,6 +3499,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param predicate the predicate called with the failure Throwable and should return true to trigger a retry.
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retry(long times, Predicate<? super Throwable> predicate) {
         return toFlowable().retry(times, predicate).singleElement();
@@ -3382,6 +3515,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param predicate the predicate that receives the failure Throwable and should return true to trigger a retry.
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retry(Predicate<? super Throwable> predicate) {
         return retry(Long.MAX_VALUE, predicate);
@@ -3396,6 +3530,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param stop the function that should return true to stop retrying
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retryUntil(final BooleanSupplier stop) {
         ObjectHelper.requireNonNull(stop, "stop is null");
@@ -3450,6 +3585,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/retry.html">ReactiveX operators documentation: Retry</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> retryWhen(
             final Function<? super Flowable<Throwable>, ? extends Publisher<?>> handler) {
@@ -3459,7 +3595,9 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Subscribes to a Maybe and ignores {@code onSuccess} and {@code onComplete} emissions.
      * <p>
-     * If the Maybe emits an error, it is routed to the RxJavaPlugins.onError handler.
+     * If the Maybe emits an error, it is wrapped into an
+     * {@link io.reactivex.exceptions.OnErrorNotImplementedException OnErrorNotImplementedException}
+     * and routed to the RxJavaPlugins.onError handler.
      * <dl>
      *  <dt><b>Scheduler:</b></dt>
      *  <dd>{@code subscribe} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -3471,13 +3609,15 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      */
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Disposable subscribe() {
-        return subscribe(Functions.emptyConsumer(), Functions.ERROR_CONSUMER, Functions.EMPTY_ACTION);
+        return subscribe(Functions.emptyConsumer(), Functions.ON_ERROR_MISSING, Functions.EMPTY_ACTION);
     }
 
     /**
      * Subscribes to a Maybe and provides a callback to handle the items it emits.
      * <p>
-     * If the Maybe emits an error, it is routed to the RxJavaPlugins.onError handler.
+     * If the Maybe emits an error, it is wrapped into an
+     * {@link io.reactivex.exceptions.OnErrorNotImplementedException OnErrorNotImplementedException}
+     * and routed to the RxJavaPlugins.onError handler.
      * <dl>
      *  <dt><b>Scheduler:</b></dt>
      *  <dd>{@code subscribe} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -3491,9 +3631,10 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *             if {@code onSuccess} is null
      * @see <a href="http://reactivex.io/documentation/operators/subscribe.html">ReactiveX operators documentation: Subscribe</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Disposable subscribe(Consumer<? super T> onSuccess) {
-        return subscribe(onSuccess, Functions.ERROR_CONSUMER, Functions.EMPTY_ACTION);
+        return subscribe(onSuccess, Functions.ON_ERROR_MISSING, Functions.EMPTY_ACTION);
     }
 
     /**
@@ -3516,6 +3657,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *             if {@code onSuccess} is null, or
      *             if {@code onError} is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Disposable subscribe(Consumer<? super T> onSuccess, Consumer<? super Throwable> onError) {
         return subscribe(onSuccess, onError, Functions.EMPTY_ACTION);
@@ -3545,13 +3687,12 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      *             if {@code onComplete} is null
      * @see <a href="http://reactivex.io/documentation/operators/subscribe.html">ReactiveX operators documentation: Subscribe</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Disposable subscribe(Consumer<? super T> onSuccess, Consumer<? super Throwable> onError,
             Action onComplete) {
         return subscribeWith(new MaybeCallbackObserver<T>(onSuccess, onError, onComplete));
     }
-
-
 
     @SchedulerSupport(SchedulerSupport.NONE)
     @Override
@@ -3583,7 +3724,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Asynchronously subscribes subscribers to this Maybe on the specified {@link Scheduler}.
      * <p>
-     * <img width="640" height="305" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.subscribeOn.png" alt="">
+     * <img width="640" height="752" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/Maybe.subscribeOn.png" alt="">
      * <dl>
      * <dt><b>Scheduler:</b></dt>
      * <dd>you specify which {@link Scheduler} this operator will use</dd>
@@ -3596,6 +3737,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://www.grahamlea.com/2014/07/rxjava-threading-examples/">RxJava Threading Examples</a>
      * @see #observeOn
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> subscribeOn(Scheduler scheduler) {
         ObjectHelper.requireNonNull(scheduler, "scheduler is null");
@@ -3625,6 +3767,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the input {@code subscriber}
      * @throws NullPointerException if {@code subscriber} is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <E extends MaybeObserver<? super T>> E subscribeWith(E observer) {
         subscribe(observer);
@@ -3634,6 +3777,8 @@ public abstract class Maybe<T> implements MaybeSource<T> {
     /**
      * Returns a Maybe that emits the items emitted by the source Maybe or the items of an alternate
      * MaybeSource if the current Maybe is empty.
+     * <p>
+     * <img width="640" height="445" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/switchifempty.m.png" alt="">
      * <p/>
      * <dl>
      *  <dt><b>Scheduler:</b></dt>
@@ -3645,6 +3790,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return  a Maybe that emits the items emitted by the source Maybe or the items of an
      *          alternate MaybeSource if the source Maybe is empty.
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final Maybe<T> switchIfEmpty(MaybeSource<? extends T> other) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -3669,6 +3815,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return a Maybe that emits the items emitted by the source Maybe until such time as {@code other} emits its first item
      * @see <a href="http://reactivex.io/documentation/operators/takeuntil.html">ReactiveX operators documentation: TakeUntil</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> takeUntil(MaybeSource<U> other) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -3697,6 +3844,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @see <a href="http://reactivex.io/documentation/operators/takeuntil.html">ReactiveX operators documentation: TakeUntil</a>
      */
     @BackpressureSupport(BackpressureKind.UNBOUNDED_IN)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> takeUntil(Publisher<U> other) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -3721,6 +3869,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/timeout.html">ReactiveX operators documentation: Timeout</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.COMPUTATION)
     public final Maybe<T> timeout(long timeout, TimeUnit timeUnit) {
         return timeout(timeout, timeUnit, Schedulers.computation());
@@ -3746,6 +3895,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/timeout.html">ReactiveX operators documentation: Timeout</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.COMPUTATION)
     public final Maybe<T> timeout(long timeout, TimeUnit timeUnit, MaybeSource<? extends T> fallback) {
         ObjectHelper.requireNonNull(fallback, "other is null");
@@ -3774,6 +3924,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/timeout.html">ReactiveX operators documentation: Timeout</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> timeout(long timeout, TimeUnit timeUnit, Scheduler scheduler, MaybeSource<? extends T> fallback) {
         ObjectHelper.requireNonNull(fallback, "fallback is null");
@@ -3801,6 +3952,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/timeout.html">ReactiveX operators documentation: Timeout</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> timeout(long timeout, TimeUnit timeUnit, Scheduler scheduler) {
         return timeout(timer(timeout, timeUnit, scheduler));
@@ -3818,6 +3970,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * or onComplete.
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> timeout(MaybeSource<U> timeoutIndicator) {
         ObjectHelper.requireNonNull(timeoutIndicator, "timeoutIndicator is null");
@@ -3838,6 +3991,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @param fallback the MaybeSource that is subscribed to if the current Maybe times out
      * @return the new Maybe instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> timeout(MaybeSource<U> timeoutIndicator, MaybeSource<? extends T> fallback) {
         ObjectHelper.requireNonNull(timeoutIndicator, "timeoutIndicator is null");
@@ -3861,6 +4015,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      */
     @BackpressureSupport(BackpressureKind.UNBOUNDED_IN)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> timeout(Publisher<U> timeoutIndicator) {
         ObjectHelper.requireNonNull(timeoutIndicator, "timeoutIndicator is null");
@@ -3885,6 +4040,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      */
     @BackpressureSupport(BackpressureKind.UNBOUNDED_IN)
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U> Maybe<T> timeout(Publisher<U> timeoutIndicator, MaybeSource<? extends T> fallback) {
         ObjectHelper.requireNonNull(timeoutIndicator, "timeoutIndicator is null");
@@ -3903,6 +4059,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @throws NullPointerException if scheduler is null
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.CUSTOM)
     public final Maybe<T> unsubscribeOn(final Scheduler scheduler) {
         ObjectHelper.requireNonNull(scheduler, "scheduler is null");
@@ -3914,10 +4071,10 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * to those values and emits the BiFunction's resulting value to downstream.
      *
      * <img width="640" height="380" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/zip.png" alt="">
-     * 
+     *
      * <p>If either this or the other MaybeSource is empty or signals an error, the resulting Maybe will
      * terminate immediately and dispose the other source.
-     * 
+     *
      * <dl>
      *  <dt><b>Scheduler:</b></dt>
      *  <dd>{@code zipWith} does not operate by default on a particular {@link Scheduler}.</dd>
@@ -3935,6 +4092,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * @return the new Maybe instance
      * @see <a href="http://reactivex.io/documentation/operators/zip.html">ReactiveX operators documentation: Zip</a>
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final <U, R> Maybe<R> zipWith(MaybeSource<? extends U> other, BiFunction<? super T, ? super U, ? extends R> zipper) {
         ObjectHelper.requireNonNull(other, "other is null");
@@ -3954,6 +4112,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * </dl>
      * @return the new TestObserver instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final TestObserver<T> test() {
         TestObserver<T> ts = new TestObserver<T>();
@@ -3971,6 +4130,7 @@ public abstract class Maybe<T> implements MaybeSource<T> {
      * Maybe.
      * @return the new TestObserver instance
      */
+    @CheckReturnValue
     @SchedulerSupport(SchedulerSupport.NONE)
     public final TestObserver<T> test(boolean cancelled) {
         TestObserver<T> ts = new TestObserver<T>();

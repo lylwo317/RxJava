@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package io.reactivex.internal.operators.flowable;
 
 import java.util.NoSuchElementException;
+
 import org.reactivestreams.*;
 
 import io.reactivex.*;
@@ -23,13 +24,13 @@ import io.reactivex.internal.subscriptions.SubscriptionHelper;
 import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableElementAtSingle<T> extends Single<T> implements FuseToFlowable<T> {
-    final Publisher<T> source;
+    final Flowable<T> source;
 
     final long index;
 
     final T defaultValue;
 
-    public FlowableElementAtSingle(Publisher<T> source, long index, T defaultValue) {
+    public FlowableElementAtSingle(Flowable<T> source, long index, T defaultValue) {
         this.source = source;
         this.index = index;
         this.defaultValue = defaultValue;
@@ -42,10 +43,10 @@ public final class FlowableElementAtSingle<T> extends Single<T> implements FuseT
 
     @Override
     public Flowable<T> fuseToFlowable() {
-        return RxJavaPlugins.onAssembly(new FlowableElementAt<T>(source, index, defaultValue));
+        return RxJavaPlugins.onAssembly(new FlowableElementAt<T>(source, index, defaultValue, true));
     }
 
-    static final class ElementAtSubscriber<T> implements Subscriber<T>, Disposable {
+    static final class ElementAtSubscriber<T> implements FlowableSubscriber<T>, Disposable {
 
         final SingleObserver<? super T> actual;
 

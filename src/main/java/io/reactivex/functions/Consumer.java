@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,6 +13,8 @@
 
 package io.reactivex.functions;
 
+import io.reactivex.annotations.NonNull;
+
 /**
  * A functional interface (callback) that accepts a single value.
  * @param <T> the value type
@@ -23,5 +25,5 @@ public interface Consumer<T> {
      * @param t the value
      * @throws Exception on error
      */
-    void accept(T t) throws Exception;
+    void accept(@NonNull T t) throws Exception;
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -2156,6 +2156,11 @@ public class FlowableNullTests {
     }
 
     @Test(expected = NullPointerException.class)
+    public void subscribeNull2() {
+        just1.subscribe((FlowableSubscriber<Integer>)null);
+    }
+
+    @Test(expected = NullPointerException.class)
     public void subscribeOnNull() {
         just1.subscribeOn(null);
     }
@@ -2820,7 +2825,7 @@ public class FlowableNullTests {
 
     @Test(expected = NullPointerException.class)
     public void unsafeSubscribeNull() {
-        just1.subscribe((Subscriber<Object>)null);
+        just1.subscribe((FlowableSubscriber<Object>)null);
     }
 
     @SuppressWarnings("unchecked")

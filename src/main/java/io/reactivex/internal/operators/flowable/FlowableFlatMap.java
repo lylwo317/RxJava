@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.Function;
@@ -34,7 +35,7 @@ public final class FlowableFlatMap<T, U> extends AbstractFlowableWithUpstream<T,
     final int maxConcurrency;
     final int bufferSize;
 
-    public FlowableFlatMap(Publisher<T> source,
+    public FlowableFlatMap(Flowable<T> source,
             Function<? super T, ? extends Publisher<? extends U>> mapper,
             boolean delayErrors, int maxConcurrency, int bufferSize) {
         super(source);
@@ -49,10 +50,16 @@ public final class FlowableFlatMap<T, U> extends AbstractFlowableWithUpstream<T,
         if (FlowableScalarXMap.tryScalarXMapSubscribe(source, s, mapper)) {
             return;
         }
-        source.subscribe(new MergeSubscriber<T, U>(s, mapper, delayErrors, maxConcurrency, bufferSize));
+        source.subscribe(subscribe(s, mapper, delayErrors, maxConcurrency, bufferSize));
     }
 
-    static final class MergeSubscriber<T, U> extends AtomicInteger implements Subscription, Subscriber<T> {
+    public static <T, U> FlowableSubscriber<T> subscribe(Subscriber<? super U> s,
+            Function<? super T, ? extends Publisher<? extends U>> mapper,
+            boolean delayErrors, int maxConcurrency, int bufferSize) {
+        return new MergeSubscriber<T, U>(s, mapper, delayErrors, maxConcurrency, bufferSize);
+    }
+
+    static final class MergeSubscriber<T, U> extends AtomicInteger implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = -2117620485640801370L;
 
@@ -152,24 +159,25 @@ public final class FlowableFlatMap<T, U> extends AbstractFlowableWithUpstream<T,
                 }
             } else {
                 InnerSubscriber<T, U> inner = new InnerSubscriber<T, U>(this, uniqueId++);
-                addInner(inner);
-                p.subscribe(inner);
+                if (addInner(inner)) {
+                    p.subscribe(inner);
+                }
             }
         }
 
-        void addInner(InnerSubscriber<T, U> inner) {
+        boolean addInner(InnerSubscriber<T, U> inner) {
             for (;;) {
                 InnerSubscriber<?, ?>[] a = subscribers.get();
                 if (a == CANCELLED) {
                     inner.dispose();
-                    return;
+                    return false;
                 }
                 int n = a.length;
                 InnerSubscriber<?, ?>[] b = new InnerSubscriber[n + 1];
                 System.arraycopy(a, 0, b, 0, n);
                 b[n] = inner;
                 if (subscribers.compareAndSet(a, b)) {
-                    return;
+                    return true;
                 }
             }
         }
@@ -574,7 +582,7 @@ public final class FlowableFlatMap<T, U> extends AbstractFlowableWithUpstream<T,
     }
 
     static final class InnerSubscriber<T, U> extends AtomicReference<Subscription>
-    implements Subscriber<U>, Disposable {
+    implements FlowableSubscriber<U>, Disposable {
 
         private static final long serialVersionUID = -4606175640614850599L;
         final long id;
@@ -600,7 +608,7 @@ public final class FlowableFlatMap<T, U> extends AbstractFlowableWithUpstream<T,
                 if (s instanceof QueueSubscription) {
                     @SuppressWarnings("unchecked")
                     QueueSubscription<U> qs = (QueueSubscription<U>) s;
-                    int m = qs.requestFusion(QueueSubscription.ANY);
+                    int m = qs.requestFusion(QueueSubscription.ANY | QueueSubscription.BOUNDARY);
                     if (m == QueueSubscription.SYNC) {
                         fusionMode = m;
                         queue = qs;

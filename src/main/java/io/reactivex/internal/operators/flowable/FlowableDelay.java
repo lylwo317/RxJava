@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -28,7 +28,7 @@ public final class FlowableDelay<T> extends AbstractFlowableWithUpstream<T, T> {
     final Scheduler scheduler;
     final boolean delayError;
 
-    public FlowableDelay(Publisher<T> source, long delay, TimeUnit unit, Scheduler scheduler, boolean delayError) {
+    public FlowableDelay(Flowable<T> source, long delay, TimeUnit unit, Scheduler scheduler, boolean delayError) {
         super(source);
         this.delay = delay;
         this.unit = unit;
@@ -50,7 +50,7 @@ public final class FlowableDelay<T> extends AbstractFlowableWithUpstream<T, T> {
         source.subscribe(new DelaySubscriber<T>(s, delay, unit, w, delayError));
     }
 
-    static final class DelaySubscriber<T> implements Subscriber<T>, Subscription {
+    static final class DelaySubscriber<T> implements FlowableSubscriber<T>, Subscription {
         final Subscriber<? super T> actual;
         final long delay;
         final TimeUnit unit;
@@ -121,8 +121,8 @@ public final class FlowableDelay<T> extends AbstractFlowableWithUpstream<T, T> {
 
         @Override
         public void cancel() {
-            w.dispose();
             s.cancel();
+            w.dispose();
         }
 
     }

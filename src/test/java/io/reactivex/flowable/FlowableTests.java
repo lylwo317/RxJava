@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -699,7 +699,7 @@ public class FlowableTests {
      * to rethrow the exception on the thread that the message comes out from the Observable.
      * The OnCompleted behavior in this case is to do nothing."
      *
-     * @throws InterruptedException
+     * @throws InterruptedException if the await is interrupted
      */
     @Test
     @Ignore("Subscribers can't throw")
@@ -808,7 +808,7 @@ public class FlowableTests {
     public void testContainsFlowable() {
         Flowable<Boolean> observable = Flowable.just("a", "b", "c").contains("b").toFlowable();
 
-        Subscriber<Boolean> observer = TestHelper.mockSubscriber();
+        FlowableSubscriber<Boolean> observer = TestHelper.mockSubscriber();
 
         observable.subscribe(observer);
 
@@ -854,7 +854,7 @@ public class FlowableTests {
     public void testContainsWithEmptyObservableFlowable() {
         Flowable<Boolean> observable = Flowable.<String> empty().contains("a").toFlowable();
 
-        Subscriber<Object> observer = TestHelper.mockSubscriber();
+        FlowableSubscriber<Object> observer = TestHelper.mockSubscriber();
 
         observable.subscribe(observer);
 

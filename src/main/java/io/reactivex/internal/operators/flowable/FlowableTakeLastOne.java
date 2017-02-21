@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,11 +14,12 @@ package io.reactivex.internal.operators.flowable;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.internal.subscriptions.*;
 
 public final class FlowableTakeLastOne<T> extends AbstractFlowableWithUpstream<T, T> {
 
-    public FlowableTakeLastOne(Publisher<T> source) {
+    public FlowableTakeLastOne(Flowable<T> source) {
         super(source);
     }
 
@@ -28,7 +29,7 @@ public final class FlowableTakeLastOne<T> extends AbstractFlowableWithUpstream<T
     }
 
     static final class TakeLastOneSubscriber<T> extends DeferredScalarSubscription<T>
-    implements Subscriber<T> {
+    implements FlowableSubscriber<T> {
 
         private static final long serialVersionUID = -5467847744262967226L;
 

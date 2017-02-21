@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -154,9 +154,8 @@ public final class ObservableTimeoutTimed<T> extends AbstractObservableWithUpstr
                 return;
             }
             done = true;
-            worker.dispose();
-            DisposableHelper.dispose(this);
             arbiter.onError(t, s);
+            worker.dispose();
         }
 
         @Override
@@ -165,20 +164,19 @@ public final class ObservableTimeoutTimed<T> extends AbstractObservableWithUpstr
                 return;
             }
             done = true;
-            worker.dispose();
-            DisposableHelper.dispose(this);
             arbiter.onComplete(s);
+            worker.dispose();
         }
 
         @Override
         public void dispose() {
+            s.dispose();
             worker.dispose();
-            DisposableHelper.dispose(this);
         }
 
         @Override
         public boolean isDisposed() {
-            return DisposableHelper.isDisposed(get());
+            return worker.isDisposed();
         }
     }
 
@@ -240,8 +238,8 @@ public final class ObservableTimeoutTimed<T> extends AbstractObservableWithUpstr
                     public void run() {
                         if (idx == index) {
                             done = true;
-                            DisposableHelper.dispose(TimeoutTimedObserver.this);
                             s.dispose();
+                            DisposableHelper.dispose(TimeoutTimedObserver.this);
 
                             actual.onError(new TimeoutException());
 
@@ -261,9 +259,9 @@ public final class ObservableTimeoutTimed<T> extends AbstractObservableWithUpstr
                 return;
             }
             done = true;
-            dispose();
 
             actual.onError(t);
+            dispose();
         }
 
         @Override
@@ -272,21 +270,20 @@ public final class ObservableTimeoutTimed<T> extends AbstractObservableWithUpstr
                 return;
             }
             done = true;
-            dispose();
 
             actual.onComplete();
+            dispose();
         }
 
         @Override
         public void dispose() {
-            worker.dispose();
-            DisposableHelper.dispose(this);
             s.dispose();
+            worker.dispose();
         }
 
         @Override
         public boolean isDisposed() {
-            return DisposableHelper.isDisposed(get());
+            return worker.isDisposed();
         }
     }
 }

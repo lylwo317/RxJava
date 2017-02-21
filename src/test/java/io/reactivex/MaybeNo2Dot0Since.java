@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -40,13 +40,16 @@ public class MaybeNo2Dot0Since {
 
 //        System.out.println(path);
 
-        int i = path.indexOf("/RxJava/");
+        int i = path.indexOf("/RxJava");
         if (i < 0) {
             System.out.println("Can't find the base RxJava directory");
             return null;
         }
 
-        String p = path.substring(0, i + 8) + "src/main/java/io/reactivex/" + baseClassName + ".java";
+        // find end of any potential postfix to /RxJava
+        int j = path.indexOf("/", i + 6);
+
+        String p = path.substring(0, j + 1) + "src/main/java/io/reactivex/" + baseClassName + ".java";
 
         File f = new File(p);
 

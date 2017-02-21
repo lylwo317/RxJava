@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,13 +14,14 @@ package io.reactivex.internal.subscribers;
 
 import java.util.concurrent.CountDownLatch;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscription;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
-import io.reactivex.internal.util.ExceptionHelper;
+import io.reactivex.internal.util.*;
 
 public abstract class BlockingBaseSubscriber<T> extends CountDownLatch
-implements Subscriber<T> {
+implements FlowableSubscriber<T> {
 
     T value;
     Throwable error;
@@ -60,6 +61,7 @@ implements Subscriber<T> {
     public final T blockingGet() {
         if (getCount() != 0) {
             try {
+                BlockingHelper.verifyNonBlocking();
                 await();
             } catch (InterruptedException ex) {
                 Subscription s = this.s;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -113,7 +113,7 @@ public final class ObservableCombineLatest<T, R> extends Observable<R> {
             lazySet(0); // release array contents
             actual.onSubscribe(this);
             for (int i = 0; i < len; i++) {
-                if (cancelled) {
+                if (done || cancelled) {
                     return;
                 }
                 sources[i].subscribe(as[i]);
@@ -124,9 +124,9 @@ public final class ObservableCombineLatest<T, R> extends Observable<R> {
         public void dispose() {
             if (!cancelled) {
                 cancelled = true;
-
+                cancelSources();
                 if (getAndIncrement() == 0) {
-                    cancel(queue);
+                    clear(queue);
                 }
             }
         }
@@ -138,6 +138,10 @@ public final class ObservableCombineLatest<T, R> extends Observable<R> {
 
         void cancel(SpscLinkedArrayQueue<?> q) {
             clear(q);
+            cancelSources();
+        }
+
+        void cancelSources() {
             for (CombinerObserver<T, R> s : observers) {
                 s.dispose();
             }
@@ -258,7 +262,7 @@ public final class ObservableCombineLatest<T, R> extends Observable<R> {
             if (d) {
                 if (delayError) {
                     if (empty) {
-                        clear(queue);
+                        cancel(q);
                         Throwable e = errors.terminate();
                         if (e != null) {
                             a.onError(e);

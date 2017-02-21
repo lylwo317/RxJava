@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,16 +13,18 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import io.reactivex.internal.functions.ObjectHelper;
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
+import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableScan<T> extends AbstractFlowableWithUpstream<T, T> {
     final BiFunction<T, T, T> accumulator;
-    public FlowableScan(Publisher<T> source, BiFunction<T, T, T> accumulator) {
+    public FlowableScan(Flowable<T> source, BiFunction<T, T, T> accumulator) {
         super(source);
         this.accumulator = accumulator;
     }
@@ -32,13 +34,15 @@ public final class FlowableScan<T> extends AbstractFlowableWithUpstream<T, T> {
         source.subscribe(new ScanSubscriber<T>(s, accumulator));
     }
 
-    static final class ScanSubscriber<T> implements Subscriber<T>, Subscription {
+    static final class ScanSubscriber<T> implements FlowableSubscriber<T>, Subscription {
         final Subscriber<? super T> actual;
         final BiFunction<T, T, T> accumulator;
 
         Subscription s;
 
         T value;
+
+        boolean done;
 
         ScanSubscriber(Subscriber<? super T> actual, BiFunction<T, T, T> accumulator) {
             this.actual = actual;
@@ -55,6 +59,9 @@ public final class FlowableScan<T> extends AbstractFlowableWithUpstream<T, T> {
 
         @Override
         public void onNext(T t) {
+            if (done) {
+                return;
+            }
             final Subscriber<? super T> a = actual;
             T v = value;
             if (v == null) {
@@ -68,7 +75,7 @@ public final class FlowableScan<T> extends AbstractFlowableWithUpstream<T, T> {
                 } catch (Throwable e) {
                     Exceptions.throwIfFatal(e);
                     s.cancel();
-                    a.onError(e);
+                    onError(e);
                     return;
                 }
 
@@ -79,11 +86,20 @@ public final class FlowableScan<T> extends AbstractFlowableWithUpstream<T, T> {
 
         @Override
         public void onError(Throwable t) {
+            if (done) {
+                RxJavaPlugins.onError(t);
+                return;
+            }
+            done = true;
             actual.onError(t);
         }
 
         @Override
         public void onComplete() {
+            if (done) {
+                return;
+            }
+            done = true;
             actual.onComplete();
         }
 

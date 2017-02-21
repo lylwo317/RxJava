@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
-import io.reactivex.Flowable;
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.*;
 import io.reactivex.flowables.ConnectableFlowable;
@@ -41,7 +41,7 @@ public final class FlowablePublish<T> extends ConnectableFlowable<T> implements 
     static final long CANCELLED = Long.MIN_VALUE;
 
     /** The source observable. */
-    final Publisher<T> source;
+    final Flowable<T> source;
     /** Holds the current subscriber that is, will be or just was subscribed to the source observable. */
     final AtomicReference<PublishSubscriber<T>> current;
 
@@ -128,7 +128,7 @@ public final class FlowablePublish<T> extends ConnectableFlowable<T> implements 
         return RxJavaPlugins.onAssembly(new FlowablePublish<T>(onSubscribe, source, curr, bufferSize));
     }
 
-    private FlowablePublish(Publisher<T> onSubscribe, Publisher<T> source,
+    private FlowablePublish(Publisher<T> onSubscribe, Flowable<T> source,
             final AtomicReference<PublishSubscriber<T>> current, int bufferSize) {
         this.onSubscribe = onSubscribe;
         this.source = source;
@@ -198,7 +198,7 @@ public final class FlowablePublish<T> extends ConnectableFlowable<T> implements 
     @SuppressWarnings("rawtypes")
     static final class PublishSubscriber<T>
     extends AtomicInteger
-    implements Subscriber<T>, Disposable {
+    implements FlowableSubscriber<T>, Disposable {
         private static final long serialVersionUID = -202316842419149694L;
 
         /** Indicates an empty array of inner subscribers. */

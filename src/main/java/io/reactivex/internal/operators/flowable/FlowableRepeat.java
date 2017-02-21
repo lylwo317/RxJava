@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,11 +17,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.internal.subscriptions.SubscriptionArbiter;
 
 public final class FlowableRepeat<T> extends AbstractFlowableWithUpstream<T, T> {
     final long count;
-    public FlowableRepeat(Publisher<T> source, long count) {
+    public FlowableRepeat(Flowable<T> source, long count) {
         super(source);
         this.count = count;
     }
@@ -36,7 +37,7 @@ public final class FlowableRepeat<T> extends AbstractFlowableWithUpstream<T, T> 
     }
 
     // FIXME update to a fresh Rsc algorithm
-    static final class RepeatSubscriber<T> extends AtomicInteger implements Subscriber<T> {
+    static final class RepeatSubscriber<T> extends AtomicInteger implements FlowableSubscriber<T> {
 
         private static final long serialVersionUID = -7098360935104053232L;
 

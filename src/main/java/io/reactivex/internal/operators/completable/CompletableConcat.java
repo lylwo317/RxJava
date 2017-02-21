@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -42,7 +42,7 @@ public final class CompletableConcat extends Completable {
 
     static final class CompletableConcatSubscriber
     extends AtomicInteger
-    implements Subscriber<CompletableSource>, Disposable {
+    implements FlowableSubscriber<CompletableSource>, Disposable {
         private static final long serialVersionUID = 9032184911934499404L;
 
         final CompletableObserver actual;

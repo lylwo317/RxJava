@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -148,7 +148,7 @@ public class MaybeTakeUntilPublisherTest {
                 to.assertFailure(TestException.class);
 
                 if (!errors.isEmpty()) {
-                    TestHelper.assertError(errors, 0, TestException.class);
+                    TestHelper.assertUndeliverable(errors, 0, TestException.class);
                 }
 
             } finally {
@@ -182,6 +182,20 @@ public class MaybeTakeUntilPublisherTest {
             TestHelper.race(r1, r2, Schedulers.single());
 
             to.assertResult();
+        }
+    }
+
+    @Test
+    public void otherSignalsAndCompletes() {
+        List<Throwable> errors = TestHelper.trackPluginErrors();
+        try {
+            Maybe.just(1).takeUntil(Flowable.just(1).take(1))
+            .test()
+            .assertResult();
+
+            assertTrue(errors.toString(), errors.isEmpty());
+        } finally {
+            RxJavaPlugins.reset();
         }
     }
 }

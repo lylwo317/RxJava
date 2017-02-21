@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -43,7 +43,7 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
         }
     };
 
-    public FlowableTimeoutTimed(Publisher<T> source,
+    public FlowableTimeoutTimed(Flowable<T> source,
             long timeout, TimeUnit unit, Scheduler scheduler, Publisher<? extends T> other) {
         super(source);
         this.timeout = timeout;
@@ -65,7 +65,7 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
         }
     }
 
-    static final class TimeoutTimedOtherSubscriber<T> implements Subscriber<T>, Disposable {
+    static final class TimeoutTimedOtherSubscriber<T> implements FlowableSubscriber<T>, Disposable {
         final Subscriber<? super T> actual;
         final long timeout;
         final TimeUnit unit;
@@ -154,9 +154,8 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
                 return;
             }
             done = true;
-            worker.dispose();
-            DisposableHelper.dispose(timer);
             arbiter.onError(t, s);
+            worker.dispose();
         }
 
         @Override
@@ -165,15 +164,14 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
                 return;
             }
             done = true;
-            worker.dispose();
-            DisposableHelper.dispose(timer);
             arbiter.onComplete(s);
+            worker.dispose();
         }
 
         @Override
         public void dispose() {
+            s.cancel();
             worker.dispose();
-            DisposableHelper.dispose(timer);
         }
 
         @Override
@@ -182,7 +180,7 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
         }
     }
 
-    static final class TimeoutTimedSubscriber<T> implements Subscriber<T>, Disposable, Subscription {
+    static final class TimeoutTimedSubscriber<T> implements FlowableSubscriber<T>, Disposable, Subscription {
         final Subscriber<? super T> actual;
         final long timeout;
         final TimeUnit unit;
@@ -255,9 +253,9 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
                 return;
             }
             done = true;
-            dispose();
 
             actual.onError(t);
+            worker.dispose();
         }
 
         @Override
@@ -266,16 +264,15 @@ public final class FlowableTimeoutTimed<T> extends AbstractFlowableWithUpstream<
                 return;
             }
             done = true;
-            dispose();
 
             actual.onComplete();
+            worker.dispose();
         }
 
         @Override
         public void dispose() {
-            worker.dispose();
-            DisposableHelper.dispose(timer);
             s.cancel();
+            worker.dispose();
         }
 
         @Override

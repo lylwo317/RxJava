@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -620,7 +620,7 @@ public class FlowableFromSourceTest {
         ts1.assertNotComplete();
     }
 
-    static final class PublishAsyncEmitter implements FlowableOnSubscribe<Integer>, Subscriber<Integer> {
+    static final class PublishAsyncEmitter implements FlowableOnSubscribe<Integer>, FlowableSubscriber<Integer> {
 
         final PublishProcessor<Integer> subject;
 
@@ -689,7 +689,7 @@ public class FlowableFromSourceTest {
         }
     }
 
-    static final class PublishAsyncEmitterNoCancel implements FlowableOnSubscribe<Integer>, Subscriber<Integer> {
+    static final class PublishAsyncEmitterNoCancel implements FlowableOnSubscribe<Integer>, FlowableSubscriber<Integer> {
 
         final PublishProcessor<Integer> subject;
 
@@ -700,7 +700,7 @@ public class FlowableFromSourceTest {
         @Override
         public void subscribe(final FlowableEmitter<Integer> t) {
 
-            subject.subscribe(new Subscriber<Integer>() {
+            subject.subscribe(new FlowableSubscriber<Integer>() {
 
                 @Override
                 public void onSubscribe(Subscription s) {

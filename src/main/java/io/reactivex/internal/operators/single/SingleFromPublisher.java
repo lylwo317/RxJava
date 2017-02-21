@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -35,7 +35,7 @@ public final class SingleFromPublisher<T> extends Single<T> {
         publisher.subscribe(new ToSingleObserver<T>(s));
     }
 
-    static final class ToSingleObserver<T> implements Subscriber<T>, Disposable {
+    static final class ToSingleObserver<T> implements FlowableSubscriber<T>, Disposable {
         final SingleObserver<? super T> actual;
 
         Subscription s;

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -367,8 +367,8 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
                 drainLoop();
             }
 
-            disposeTimer();
             actual.onError(t);
+            disposeTimer();
         }
 
         @Override
@@ -378,8 +378,8 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
                 drainLoop();
             }
 
-            disposeTimer();
             actual.onComplete();
+            disposeTimer();
         }
 
         @Override
@@ -439,6 +439,8 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
                     if (isHolder) {
                         ConsumerIndexHolder consumerIndexHolder = (ConsumerIndexHolder) o;
                         if (producerIndex == consumerIndexHolder.index) {
+                            w.onComplete();
+
                             w = UnicastSubject.create(bufferSize);
                             window = w;
 
@@ -588,8 +590,8 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
                 drainLoop();
             }
 
-            disposeWorker();
             actual.onError(t);
+            disposeWorker();
         }
 
         @Override
@@ -599,8 +601,8 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
                 drainLoop();
             }
 
-            disposeWorker();
             actual.onComplete();
+            disposeWorker();
         }
 
         @Override
@@ -652,7 +654,6 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
 
                     if (d && (empty || sw)) {
                         q.clear();
-                        disposeWorker();
                         Throwable e = error;
                         if (e != null) {
                             for (UnicastSubject<T> w : ws) {
@@ -663,6 +664,7 @@ public final class ObservableWindowTimed<T> extends AbstractObservableWithUpstre
                                 w.onComplete();
                             }
                         }
+                        disposeWorker();
                         ws.clear();
                         return;
                     }

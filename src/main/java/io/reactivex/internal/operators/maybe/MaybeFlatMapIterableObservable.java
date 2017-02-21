@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -16,6 +16,7 @@ package io.reactivex.internal.operators.maybe;
 import java.util.Iterator;
 
 import io.reactivex.*;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
@@ -100,7 +101,7 @@ public final class MaybeFlatMapIterableObservable<T, R> extends Observable<R> {
 
             this.it = iter;
 
-            if (outputFused && iter != null) {
+            if (outputFused) {
                 a.onNext(null);
                 a.onComplete();
                 return;
@@ -187,6 +188,7 @@ public final class MaybeFlatMapIterableObservable<T, R> extends Observable<R> {
             return it == null;
         }
 
+        @Nullable
         @Override
         public R poll() throws Exception {
             Iterator<? extends R> iter = it;

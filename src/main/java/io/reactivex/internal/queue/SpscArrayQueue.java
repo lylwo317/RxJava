@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -20,6 +20,7 @@ package io.reactivex.internal.queue;
 
 import java.util.concurrent.atomic.*;
 
+import io.reactivex.annotations.Nullable;
 import io.reactivex.internal.fuseable.SimplePlainQueue;
 import io.reactivex.internal.util.Pow2;
 
@@ -35,7 +36,7 @@ import io.reactivex.internal.util.Pow2;
  * 2012 - Junchang- BQueue- Efficient and Practical Queuing.pdf <br>
  * </i> This implementation is wait free.
  *
- * @param <E>
+ * @param <E> the element type of the queue
  */
 public final class SpscArrayQueue<E> extends AtomicReferenceArray<E> implements SimplePlainQueue<E> {
     private static final long serialVersionUID = -1296597691183856449L;
@@ -82,6 +83,7 @@ public final class SpscArrayQueue<E> extends AtomicReferenceArray<E> implements 
         return offer(v1) && offer(v2);
     }
 
+    @Nullable
     @Override
     public E poll() {
         final long index = consumerIndex.get();

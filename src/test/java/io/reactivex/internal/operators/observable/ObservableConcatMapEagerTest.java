@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -851,7 +851,7 @@ public class ObservableConcatMapEagerTest {
                 } else {
                     to.assertError(TestException.class);
                     if (!errors.isEmpty()) {
-                        TestHelper.assertError(errors, 0, TestException.class);
+                        TestHelper.assertUndeliverable(errors, 0, TestException.class);
                     }
                 }
             } finally {
@@ -982,5 +982,23 @@ public class ObservableConcatMapEagerTest {
                 });
             }
         });
+    }
+
+    @Test
+    public void oneDelayed() {
+        Observable.just(1, 2, 3, 4, 5)
+        .concatMapEager(new Function<Integer, ObservableSource<Integer>>() {
+            @Override
+            public ObservableSource<Integer> apply(Integer i) throws Exception {
+                return i == 3 ? Observable.just(i) : Observable
+                        .just(i)
+                        .delay(1, TimeUnit.MILLISECONDS, Schedulers.io());
+            }
+        })
+        .observeOn(Schedulers.io())
+        .test()
+        .awaitDone(5, TimeUnit.SECONDS)
+        .assertResult(1, 2, 3, 4, 5)
+        ;
     }
 }

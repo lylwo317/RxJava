@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -24,7 +24,7 @@ import io.reactivex.internal.functions.ObjectHelper;
 
 /**
  * Maps the success value of the source SingleSource into a Completable.
- * @param <T>
+ * @param <T> the value type of the source SingleSource
  */
 public final class SingleFlatMapCompletable<T> extends Completable {
 
@@ -87,7 +87,9 @@ public final class SingleFlatMapCompletable<T> extends Completable {
                 return;
             }
 
-            cs.subscribe(this);
+            if (!isDisposed()) {
+                cs.subscribe(this);
+            }
         }
 
         @Override

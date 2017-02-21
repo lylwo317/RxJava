@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -87,7 +87,7 @@ public class FutureSubscriberTest {
                 assertEquals("One", ex.getCause().getMessage());
             }
 
-            TestHelper.assertError(errors, 0, TestException.class, "Two");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Two");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -267,5 +267,18 @@ public class FutureSubscriberTest {
         fs.onComplete();
 
         assertEquals(1, fs.get(5, TimeUnit.MILLISECONDS).intValue());
+    }
+
+    @Test
+    public void completeAsync() throws Exception {
+        Schedulers.single().scheduleDirect(new Runnable() {
+            @Override
+            public void run() {
+                fs.onNext(1);
+                fs.onComplete();
+            }
+        }, 500, TimeUnit.MILLISECONDS);
+
+        assertEquals(1, fs.get().intValue());
     }
 }

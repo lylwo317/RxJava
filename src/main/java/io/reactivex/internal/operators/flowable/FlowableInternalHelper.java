@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -77,7 +77,7 @@ public final class FlowableInternalHelper {
 
         @Override
         public Publisher<T> apply(final T v) throws Exception {
-            return new FlowableTake<U>(itemDelay.apply(v), 1).map(Functions.justFunction(v)).defaultIfEmpty(v);
+            return new FlowableTakePublisher<U>(itemDelay.apply(v), 1).map(Functions.justFunction(v)).defaultIfEmpty(v);
         }
     }
 
@@ -165,7 +165,7 @@ public final class FlowableInternalHelper {
         public Publisher<R> apply(final T t) throws Exception {
             @SuppressWarnings("unchecked")
             Publisher<U> u = (Publisher<U>)mapper.apply(t);
-            return new FlowableMap<U, R>(u, new FlatMapWithCombinerInner<U, R, T>(combiner, t));
+            return new FlowableMapPublisher<U, R>(u, new FlatMapWithCombinerInner<U, R, T>(combiner, t));
         }
     }
 

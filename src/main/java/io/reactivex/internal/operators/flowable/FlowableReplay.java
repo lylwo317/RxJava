@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,7 +13,6 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import io.reactivex.internal.functions.ObjectHelper;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -25,6 +24,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.flowables.ConnectableFlowable;
 import io.reactivex.functions.*;
+import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.fuseable.HasUpstreamPublisher;
 import io.reactivex.internal.subscribers.SubscriberResourceWrapper;
 import io.reactivex.internal.subscriptions.*;
@@ -34,7 +34,7 @@ import io.reactivex.schedulers.Timed;
 
 public final class FlowableReplay<T> extends ConnectableFlowable<T> implements HasUpstreamPublisher<T> {
     /** The source observable. */
-    final Publisher<T> source;
+    final Flowable<T> source;
     /** Holds the current subscriber that is, will be or just was subscribed to the source observable. */
     final AtomicReference<ReplaySubscriber<T>> current;
     /** A factory that creates the appropriate buffer for the ReplaySubscriber. */
@@ -127,7 +127,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
      * @return the new ConnectableObservable instance
      */
     @SuppressWarnings("unchecked")
-    public static <T> ConnectableFlowable<T> createFrom(Publisher<? extends T> source) {
+    public static <T> ConnectableFlowable<T> createFrom(Flowable<? extends T> source) {
         return create(source, DEFAULT_UNBOUNDED_FACTORY);
     }
 
@@ -138,7 +138,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
      * @param bufferSize the maximum number of elements to hold
      * @return the new ConnectableObservable instance
      */
-    public static <T> ConnectableFlowable<T> create(Publisher<T> source,
+    public static <T> ConnectableFlowable<T> create(Flowable<T> source,
             final int bufferSize) {
         if (bufferSize == Integer.MAX_VALUE) {
             return createFrom(source);
@@ -160,7 +160,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
      * @param scheduler the target scheduler providing the current time
      * @return the new ConnectableObservable instance
      */
-    public static <T> ConnectableFlowable<T> create(Publisher<T> source,
+    public static <T> ConnectableFlowable<T> create(Flowable<T> source,
             long maxAge, TimeUnit unit, Scheduler scheduler) {
         return create(source, maxAge, unit, scheduler, Integer.MAX_VALUE);
     }
@@ -175,7 +175,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
      * @param bufferSize the maximum number of elements to hold
      * @return the new ConnectableFlowable instance
      */
-    public static <T> ConnectableFlowable<T> create(Publisher<T> source,
+    public static <T> ConnectableFlowable<T> create(Flowable<T> source,
             final long maxAge, final TimeUnit unit, final Scheduler scheduler, final int bufferSize) {
         return create(source, new Callable<ReplayBuffer<T>>() {
             @Override
@@ -191,7 +191,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
      * @param bufferFactory the factory to instantiate the appropriate buffer when the observable becomes active
      * @return the connectable observable
      */
-    static <T> ConnectableFlowable<T> create(Publisher<T> source,
+    static <T> ConnectableFlowable<T> create(Flowable<T> source,
             final Callable<? extends ReplayBuffer<T>> bufferFactory) {
         // the current connection to source needs to be shared between the operator and its onSubscribe call
         final AtomicReference<ReplaySubscriber<T>> curr = new AtomicReference<ReplaySubscriber<T>>();
@@ -254,7 +254,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
         return RxJavaPlugins.onAssembly(new FlowableReplay<T>(onSubscribe, source, curr, bufferFactory));
     }
 
-    private FlowableReplay(Publisher<T> onSubscribe, Publisher<T> source,
+    private FlowableReplay(Publisher<T> onSubscribe, Flowable<T> source,
             final AtomicReference<ReplaySubscriber<T>> current,
             final Callable<? extends ReplayBuffer<T>> bufferFactory) {
         this.onSubscribe = onSubscribe;
@@ -336,7 +336,10 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
     }
 
     @SuppressWarnings("rawtypes")
-    static final class ReplaySubscriber<T> implements Subscriber<T>, Disposable {
+    static final class ReplaySubscriber<T>
+    extends AtomicReference<Subscription>
+    implements FlowableSubscriber<T>, Disposable {
+        private static final long serialVersionUID = 7224554242710036740L;
         /** Holds notifications from upstream. */
         final ReplayBuffer<T> buffer;
         /** Indicates this Subscriber received a terminal event. */
@@ -361,8 +364,6 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
         long maxChildRequested;
         /** Counts the outstanding upstream requests until the producer arrives. */
         long maxUpstreamRequested;
-        /** The upstream producer. */
-        volatile Subscription subscription;
 
         @SuppressWarnings("unchecked")
         ReplaySubscriber(ReplayBuffer<T> buffer) {
@@ -386,7 +387,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
             // current.compareAndSet(ReplaySubscriber.this, null);
             // we don't care if it fails because it means the current has
             // been replaced in the meantime
-            subscription.cancel();
+            SubscriptionHelper.cancel(this);
         }
 
         /**
@@ -476,8 +477,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
 
         @Override
         public void onSubscribe(Subscription p) {
-            if (SubscriptionHelper.validate(subscription, p)) {
-                subscription = p;
+            if (SubscriptionHelper.setOnce(this, p)) {
                 manageRequests();
                 for (InnerSubscription<T> rp : subscribers.get()) {
                     buffer.replay(rp);
@@ -548,7 +548,7 @@ public final class FlowableReplay<T> extends ConnectableFlowable<T> implements H
                 }
 
                 long ur = maxUpstreamRequested;
-                Subscription p = subscription;
+                Subscription p = get();
 
                 long diff = maxTotalRequests - ri;
                 if (diff != 0L) {

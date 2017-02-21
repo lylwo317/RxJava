@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package io.reactivex.internal.operators.flowable;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.lang.reflect.*;
@@ -26,10 +27,10 @@ import org.mockito.InOrder;
 import org.reactivestreams.*;
 
 import io.reactivex.*;
-import io.reactivex.Flowable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.*;
 import io.reactivex.internal.functions.Functions;
+import io.reactivex.internal.fuseable.QueueSubscription;
 import io.reactivex.internal.subscriptions.BooleanSubscription;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.processors.PublishProcessor;
@@ -1654,7 +1655,7 @@ public class FlowableZipTest {
 
             sub[0].onError(new TestException("Second"));
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -1766,5 +1767,130 @@ public class FlowableZipTest {
         }, true)
         .test(0L)
         .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void noCrossBoundaryFusion() {
+        for (int i = 0; i < 500; i++) {
+            TestSubscriber<List<Object>> ts = Flowable.zip(
+                    Flowable.just(1).observeOn(Schedulers.single()).map(new Function<Integer, Object>() {
+                        @Override
+                        public Object apply(Integer v) throws Exception {
+                            return Thread.currentThread().getName().substring(0, 4);
+                        }
+                    }),
+                    Flowable.just(1).observeOn(Schedulers.computation()).map(new Function<Integer, Object>() {
+                        @Override
+                        public Object apply(Integer v) throws Exception {
+                            return Thread.currentThread().getName().substring(0, 4);
+                        }
+                    }),
+                    new BiFunction<Object, Object, List<Object>>() {
+                        @Override
+                        public List<Object> apply(Object t1, Object t2) throws Exception {
+                            return Arrays.asList(t1, t2);
+                        }
+                    }
+            )
+            .test()
+            .awaitDone(5, TimeUnit.SECONDS)
+            .assertValueCount(1);
+
+            List<Object> list = ts.values().get(0);
+
+            assertTrue(list.toString(), list.contains("RxSi"));
+            assertTrue(list.toString(), list.contains("RxCo"));
+        }
+    }
+
+    static final class ThrowingQueueSubscription implements QueueSubscription<Integer>, Publisher<Integer> {
+
+        @Override
+        public int requestFusion(int mode) {
+            return mode & SYNC;
+        }
+
+        @Override
+        public boolean offer(Integer value) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean offer(Integer v1, Integer v2) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Integer poll() throws Exception {
+            throw new TestException();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+        }
+
+        @Override
+        public void request(long n) {
+        }
+
+        @Override
+        public void cancel() {
+        }
+
+        @Override
+        public void subscribe(Subscriber<? super Integer> s) {
+            s.onSubscribe(this);
+        }
+    }
+
+    @Test
+    public void fusedInputThrows2() {
+        Flowable.zip(new ThrowingQueueSubscription(), Flowable.just(1), new BiFunction<Integer, Integer, Integer>() {
+            @Override
+            public Integer apply(Integer a, Integer b) throws Exception {
+                return a + b;
+            }
+        })
+        .test()
+        .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void fusedInputThrows2Backpressured() {
+        Flowable.zip(new ThrowingQueueSubscription(), Flowable.just(1), new BiFunction<Integer, Integer, Integer>() {
+            @Override
+            public Integer apply(Integer a, Integer b) throws Exception {
+                return a + b;
+            }
+        })
+        .test(0)
+        .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void cancelOnBackpressureBoundary() {
+        TestSubscriber<Integer> ts = new TestSubscriber<Integer>(1L) {
+            @Override
+            public void onNext(Integer t) {
+                super.onNext(t);
+                cancel();
+                onComplete();
+            }
+        };
+
+        Flowable.zip(Flowable.range(1, 2), Flowable.range(3, 2), new BiFunction<Integer, Integer, Integer>() {
+            @Override
+            public Integer apply(Integer a, Integer b) throws Exception {
+                return a + b;
+            }
+        })
+        .subscribe(ts);
+
+        ts.assertResult(4);
     }
 }

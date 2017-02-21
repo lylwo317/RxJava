@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -345,9 +345,9 @@ public class ExecutorSchedulerTest extends AbstractSchedulerConcurrencyTests {
 
             assertSame(EmptyDisposable.INSTANCE, s.schedulePeriodicallyDirect(Functions.EMPTY_RUNNABLE, 10, 10, TimeUnit.MILLISECONDS));
 
-            TestHelper.assertError(errors, 0, RejectedExecutionException.class);
-            TestHelper.assertError(errors, 1, RejectedExecutionException.class);
-            TestHelper.assertError(errors, 2, RejectedExecutionException.class);
+            TestHelper.assertUndeliverable(errors, 0, RejectedExecutionException.class);
+            TestHelper.assertUndeliverable(errors, 1, RejectedExecutionException.class);
+            TestHelper.assertUndeliverable(errors, 2, RejectedExecutionException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -370,9 +370,9 @@ public class ExecutorSchedulerTest extends AbstractSchedulerConcurrencyTests {
             s = Schedulers.from(exec).createWorker();
             assertSame(EmptyDisposable.INSTANCE, s.schedulePeriodically(Functions.EMPTY_RUNNABLE, 10, 10, TimeUnit.MILLISECONDS));
 
-            TestHelper.assertError(errors, 0, RejectedExecutionException.class);
-            TestHelper.assertError(errors, 1, RejectedExecutionException.class);
-            TestHelper.assertError(errors, 2, RejectedExecutionException.class);
+            TestHelper.assertUndeliverable(errors, 0, RejectedExecutionException.class);
+            TestHelper.assertUndeliverable(errors, 1, RejectedExecutionException.class);
+            TestHelper.assertUndeliverable(errors, 2, RejectedExecutionException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -484,10 +484,81 @@ public class ExecutorSchedulerTest extends AbstractSchedulerConcurrencyTests {
         });
         Disposable d = s.scheduleDirect(Functions.EMPTY_RUNNABLE);
 
-        assertFalse(d.isDisposed());
-
-        d.dispose();
-
         assertTrue(d.isDisposed());
+    }
+
+    @Test(timeout = 1000)
+    public void runnableDisposedAsync() throws Exception {
+        final Scheduler s = Schedulers.from(new Executor() {
+            @Override
+            public void execute(Runnable r) {
+                new Thread(r).start();
+            }
+        });
+        Disposable d = s.scheduleDirect(Functions.EMPTY_RUNNABLE);
+
+        while (!d.isDisposed()) {
+            Thread.sleep(1);
+        }
+    }
+
+    @Test(timeout = 1000)
+    public void runnableDisposedAsync2() throws Exception {
+        final Scheduler s = Schedulers.from(executor);
+        Disposable d = s.scheduleDirect(Functions.EMPTY_RUNNABLE);
+
+        while (!d.isDisposed()) {
+            Thread.sleep(1);
+        }
+    }
+
+    @Test(timeout = 1000)
+    public void runnableDisposedAsyncCrash() throws Exception {
+        final Scheduler s = Schedulers.from(new Executor() {
+            @Override
+            public void execute(Runnable r) {
+                new Thread(r).start();
+            }
+        });
+        Disposable d = s.scheduleDirect(new Runnable() {
+            @Override
+            public void run() {
+                throw new IllegalStateException();
+            }
+        });
+
+        while (!d.isDisposed()) {
+            Thread.sleep(1);
+        }
+    }
+
+    @Test(timeout = 1000)
+    public void runnableDisposedAsyncTimed() throws Exception {
+        final Scheduler s = Schedulers.from(new Executor() {
+            @Override
+            public void execute(Runnable r) {
+                new Thread(r).start();
+            }
+        });
+        Disposable d = s.scheduleDirect(Functions.EMPTY_RUNNABLE, 1, TimeUnit.MILLISECONDS);
+
+        while (!d.isDisposed()) {
+            Thread.sleep(1);
+        }
+    }
+
+    @Test(timeout = 1000)
+    public void runnableDisposedAsyncTimed2() throws Exception {
+        ExecutorService executorScheduler = Executors.newScheduledThreadPool(1, new RxThreadFactory("TestCustomPoolTimed"));
+        try {
+            final Scheduler s = Schedulers.from(executorScheduler);
+            Disposable d = s.scheduleDirect(Functions.EMPTY_RUNNABLE, 1, TimeUnit.MILLISECONDS);
+
+            while (!d.isDisposed()) {
+                Thread.sleep(1);
+            }
+        } finally {
+            executorScheduler.shutdownNow();
+        }
     }
 }

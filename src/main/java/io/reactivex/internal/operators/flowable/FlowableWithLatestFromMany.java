@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
+import io.reactivex.annotations.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
@@ -33,21 +35,22 @@ import io.reactivex.plugins.RxJavaPlugins;
  * @param <R> the output type
  */
 public final class FlowableWithLatestFromMany<T, R> extends AbstractFlowableWithUpstream<T, R> {
-
+    @Nullable
     final Publisher<?>[] otherArray;
 
+    @Nullable
     final Iterable<? extends Publisher<?>> otherIterable;
 
     final Function<? super Object[], R> combiner;
 
-    public FlowableWithLatestFromMany(Publisher<T> source, Publisher<?>[] otherArray, Function<? super Object[], R> combiner) {
+    public FlowableWithLatestFromMany(@NonNull Flowable<T> source, @NonNull Publisher<?>[] otherArray, Function<? super Object[], R> combiner) {
         super(source);
         this.otherArray = otherArray;
         this.otherIterable = null;
         this.combiner = combiner;
     }
 
-    public FlowableWithLatestFromMany(Publisher<T> source, Iterable<? extends Publisher<?>> otherIterable, Function<? super Object[], R> combiner) {
+    public FlowableWithLatestFromMany(@NonNull Flowable<T> source, @NonNull Iterable<? extends Publisher<?>> otherIterable, @NonNull Function<? super Object[], R> combiner) {
         super(source);
         this.otherArray = null;
         this.otherIterable = otherIterable;
@@ -97,7 +100,7 @@ public final class FlowableWithLatestFromMany<T, R> extends AbstractFlowableWith
 
     static final class WithLatestFromSubscriber<T, R>
     extends AtomicInteger
-    implements Subscriber<T>, Subscription {
+    implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = 1577321883966341961L;
 
@@ -245,7 +248,7 @@ public final class FlowableWithLatestFromMany<T, R> extends AbstractFlowableWith
 
     static final class WithLatestInnerSubscriber
     extends AtomicReference<Subscription>
-    implements Subscriber<Object>, Disposable {
+    implements FlowableSubscriber<Object>, Disposable {
 
         private static final long serialVersionUID = 3256684027868224024L;
 

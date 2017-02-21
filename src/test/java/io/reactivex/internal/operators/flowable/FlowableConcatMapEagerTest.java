@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -900,7 +900,7 @@ public class FlowableConcatMapEagerTest {
                 } else {
                     to.assertError(TestException.class);
                     if (!errors.isEmpty()) {
-                        TestHelper.assertError(errors, 0, TestException.class);
+                        TestHelper.assertUndeliverable(errors, 0, TestException.class);
                     }
                 }
             } finally {
@@ -1084,7 +1084,7 @@ public class FlowableConcatMapEagerTest {
 
             sub[0].onError(new TestException("Second"));
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -1112,7 +1112,7 @@ public class FlowableConcatMapEagerTest {
             .test(0L)
             .assertFailure(MissingBackpressureException.class);
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -1174,5 +1174,23 @@ public class FlowableConcatMapEagerTest {
         .assertValueCount(n)
         .assertComplete()
         .assertNoErrors();
+    }
+
+    @Test
+    public void oneDelayed() {
+        Flowable.just(1, 2, 3, 4, 5)
+        .concatMapEager(new Function<Integer, Flowable<Integer>>() {
+            @Override
+            public Flowable<Integer> apply(Integer i) throws Exception {
+                return i == 3 ? Flowable.just(i) : Flowable
+                        .just(i)
+                        .delay(1, TimeUnit.MILLISECONDS, Schedulers.io());
+            }
+        })
+        .observeOn(Schedulers.io())
+        .test()
+        .awaitDone(5, TimeUnit.SECONDS)
+        .assertResult(1, 2, 3, 4, 5)
+        ;
     }
 }

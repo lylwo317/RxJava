@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -27,12 +27,13 @@ import org.mockito.*;
 import io.reactivex.*;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.*;
 import io.reactivex.internal.functions.Functions;
 import io.reactivex.observers.*;
 import io.reactivex.plugins.RxJavaPlugins;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.schedulers.*;
 import io.reactivex.subjects.PublishSubject;
 
 public class ObservableCombineLatestTest {
@@ -1009,11 +1010,192 @@ public class ObservableCombineLatestTest {
                 }
 
                 for (Throwable e : errors) {
-                    assertTrue(e.toString(), e instanceof TestException);
+                    assertTrue(e.toString(), e.getCause() instanceof TestException);
                 }
             } finally {
                 RxJavaPlugins.reset();
             }
         }
+    }
+
+    @Test
+    public void dontSubscribeIfDone() {
+        List<Throwable> errors = TestHelper.trackPluginErrors();
+        try {
+            final int[] count = { 0 };
+
+            Observable.combineLatest(Observable.empty(),
+                    Observable.error(new TestException())
+                    .doOnSubscribe(new Consumer<Disposable>() {
+                        @Override
+                        public void accept(Disposable d) throws Exception {
+                            count[0]++;
+                        }
+                    }),
+                    new BiFunction<Object, Object, Object>() {
+                        @Override
+                        public Object apply(Object a, Object b) throws Exception {
+                            return 0;
+                        }
+                    })
+            .test()
+            .assertResult();
+
+            assertEquals(0, count[0]);
+
+            assertTrue(errors.toString(), errors.isEmpty());
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void dontSubscribeIfDone2() {
+        List<Throwable> errors = TestHelper.trackPluginErrors();
+        try {
+            final int[] count = { 0 };
+
+            Observable.combineLatestDelayError(
+                    Arrays.asList(Observable.empty(),
+                        Observable.error(new TestException())
+                        .doOnSubscribe(new Consumer<Disposable>() {
+                            @Override
+                            public void accept(Disposable d) throws Exception {
+                                count[0]++;
+                            }
+                        })
+                    ),
+                    new Function<Object[], Object>() {
+                        @Override
+                        public Object apply(Object[] a) throws Exception {
+                            return 0;
+                        }
+                    })
+            .test()
+            .assertResult();
+
+            assertEquals(0, count[0]);
+
+            assertTrue(errors.toString(), errors.isEmpty());
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void combine2Observable2Errors() throws Exception {
+        List<Throwable> errors = TestHelper.trackPluginErrors();
+        try {
+            TestObserver<Object> testObserver = TestObserver.create();
+
+            TestScheduler testScheduler = new TestScheduler();
+
+            Observable<Integer> emptyObservable = Observable.timer(10, TimeUnit.MILLISECONDS, testScheduler)
+                    .flatMap(new Function<Long, ObservableSource<Integer>>() {
+                        @Override
+                        public ObservableSource<Integer> apply(Long aLong) throws Exception {
+                            return Observable.error(new Exception());
+                        }
+                    });
+            Observable<Object> errorObservable = Observable.timer(100, TimeUnit.MILLISECONDS, testScheduler).map(new Function<Long, Object>() {
+                @Override
+                public Object apply(Long aLong) throws Exception {
+                    throw new Exception();
+                }
+            });
+
+            Observable.combineLatestDelayError(
+                    Arrays.asList(
+                            emptyObservable
+                                    .doOnEach(new Consumer<Notification<Integer>>() {
+                                        @Override
+                                        public void accept(Notification<Integer> integerNotification) throws Exception {
+                                            System.out.println("emptyObservable: " + integerNotification);
+                                        }
+                                    })
+                                    .doFinally(new Action() {
+                                        @Override
+                                        public void run() throws Exception {
+                                            System.out.println("emptyObservable: doFinally");
+                                        }
+                                    }),
+                            errorObservable
+                                    .doOnEach(new Consumer<Notification<Object>>() {
+                                        @Override
+                                        public void accept(Notification<Object> integerNotification) throws Exception {
+                                            System.out.println("errorObservable: " + integerNotification);
+                                        }
+                                    })
+                                    .doFinally(new Action() {
+                                        @Override
+                                        public void run() throws Exception {
+                                            System.out.println("errorObservable: doFinally");
+                                        }
+                                    })),
+                    new Function<Object[], Object>() {
+                        @Override
+                        public Object apply(Object[] objects) throws Exception {
+                            return 0;
+                        }
+                    }
+            )
+                    .doOnEach(new Consumer<Notification<Object>>() {
+                        @Override
+                        public void accept(Notification<Object> integerNotification) throws Exception {
+                            System.out.println("combineLatestDelayError: " + integerNotification);
+                        }
+                    })
+                    .doFinally(new Action() {
+                        @Override
+                        public void run() throws Exception {
+                            System.out.println("combineLatestDelayError: doFinally");
+                        }
+                    })
+                    .subscribe(testObserver);
+
+            testScheduler.advanceTimeBy(100, TimeUnit.MILLISECONDS);
+
+            testObserver.awaitTerminalEvent();
+
+            assertTrue(errors.toString(), errors.isEmpty());
+        } finally {
+            RxJavaPlugins.reset();
+        }
+    }
+
+    @Test
+    public void eagerDispose() {
+        final PublishSubject<Integer> ps1 = PublishSubject.create();
+        final PublishSubject<Integer> ps2 = PublishSubject.create();
+
+        TestObserver<Integer> ts = new TestObserver<Integer>() {
+            @Override
+            public void onNext(Integer t) {
+                super.onNext(t);
+                cancel();
+                if (ps1.hasObservers()) {
+                    onError(new IllegalStateException("ps1 not disposed"));
+                } else
+                if (ps2.hasObservers()) {
+                    onError(new IllegalStateException("ps2 not disposed"));
+                } else {
+                    onComplete();
+                }
+            }
+        };
+
+        Observable.combineLatest(ps1, ps2, new BiFunction<Integer, Integer, Integer>() {
+            @Override
+            public Integer apply(Integer t1, Integer t2) throws Exception {
+                return t1 + t2;
+            }
+        })
+        .subscribe(ts);
+
+        ps1.onNext(1);
+        ps2.onNext(2);
+        ts.assertResult(3);
     }
 }

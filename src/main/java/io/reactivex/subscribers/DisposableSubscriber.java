@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,8 +15,9 @@ package io.reactivex.subscribers;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscription;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
 
@@ -25,7 +26,7 @@ import io.reactivex.internal.subscriptions.SubscriptionHelper;
  *
  * @param <T> the received value type.
  */
-public abstract class DisposableSubscriber<T> implements Subscriber<T>, Disposable {
+public abstract class DisposableSubscriber<T> implements FlowableSubscriber<T>, Disposable {
     final AtomicReference<Subscription> s = new AtomicReference<Subscription>();
 
     @Override

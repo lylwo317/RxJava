@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
-import io.reactivex.Flowable;
+import io.reactivex.*;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.internal.subscriptions.*;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -147,7 +147,7 @@ public final class FlowableAmb<T> extends Flowable<T> {
         }
     }
 
-    static final class AmbInnerSubscriber<T> extends AtomicReference<Subscription> implements Subscriber<T>, Subscription {
+    static final class AmbInnerSubscriber<T> extends AtomicReference<Subscription> implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = -1185974347409665484L;
         final AmbCoordinator<T> parent;

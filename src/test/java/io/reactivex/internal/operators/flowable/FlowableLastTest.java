@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -356,5 +356,23 @@ public class FlowableLastTest {
         .lastElement()
         .test()
         .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void errorLastOrErrorFlowable() {
+        Flowable.error(new TestException())
+        .lastOrError()
+        .toFlowable()
+        .test()
+        .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void emptyLastOrErrorFlowable() {
+        Flowable.empty()
+        .lastOrError()
+        .toFlowable()
+        .test()
+        .assertFailure(NoSuchElementException.class);
     }
 }

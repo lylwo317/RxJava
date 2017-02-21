@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -115,6 +115,7 @@ public final class ObservableZip<T, R> extends Observable<R> {
         public void dispose() {
             if (!cancelled) {
                 cancelled = true;
+                cancelSources();
                 if (getAndIncrement() == 0) {
                     clear();
                 }
@@ -126,9 +127,19 @@ public final class ObservableZip<T, R> extends Observable<R> {
             return cancelled;
         }
 
-        void clear() {
+        void cancel() {
+            clear();
+            cancelSources();
+        }
+
+        void cancelSources() {
             for (ZipObserver<?, ?> zs : observers) {
                 zs.dispose();
+            }
+        }
+
+        void clear() {
+            for (ZipObserver<?, ?> zs : observers) {
                 zs.queue.clear();
             }
         }
@@ -168,7 +179,7 @@ public final class ObservableZip<T, R> extends Observable<R> {
                             if (z.done && !delayError) {
                                 Throwable ex = z.error;
                                 if (ex != null) {
-                                    clear();
+                                    cancel();
                                     a.onError(ex);
                                     return;
                                 }
@@ -186,7 +197,7 @@ public final class ObservableZip<T, R> extends Observable<R> {
                         v = ObjectHelper.requireNonNull(zipper.apply(os.clone()), "The zipper returned a null value");
                     } catch (Throwable ex) {
                         Exceptions.throwIfFatal(ex);
-                        clear();
+                        cancel();
                         a.onError(ex);
                         return;
                     }
@@ -205,7 +216,7 @@ public final class ObservableZip<T, R> extends Observable<R> {
 
         boolean checkTerminated(boolean d, boolean empty, Observer<? super R> a, boolean delayError, ZipObserver<?, ?> source) {
             if (cancelled) {
-                clear();
+                cancel();
                 return true;
             }
 
@@ -213,7 +224,7 @@ public final class ObservableZip<T, R> extends Observable<R> {
                 if (delayError) {
                     if (empty) {
                         Throwable e = source.error;
-                        clear();
+                        cancel();
                         if (e != null) {
                             a.onError(e);
                         } else {
@@ -224,12 +235,12 @@ public final class ObservableZip<T, R> extends Observable<R> {
                 } else {
                     Throwable e = source.error;
                     if (e != null) {
-                        clear();
+                        cancel();
                         a.onError(e);
                         return true;
                     } else
                     if (empty) {
-                        clear();
+                        cancel();
                         a.onComplete();
                         return true;
                     }

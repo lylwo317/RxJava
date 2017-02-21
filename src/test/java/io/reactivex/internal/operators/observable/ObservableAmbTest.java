@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -359,8 +359,28 @@ public class ObservableAmbTest {
 
             to.assertFailure(TestException.class);
             if (!errors.isEmpty()) {
-                TestHelper.assertError(errors, 0, TestException.class);
+                TestHelper.assertUndeliverable(errors, 0, TestException.class);
             }
         }
+    }
+
+    @Test
+    public void ambWithOrder() {
+        Observable<Integer> error = Observable.error(new RuntimeException());
+        Observable.just(1).ambWith(error).test().assertValue(1).assertComplete();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void ambIterableOrder() {
+        Observable<Integer> error = Observable.error(new RuntimeException());
+        Observable.amb(Arrays.asList(Observable.just(1), error)).test().assertValue(1).assertComplete();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void ambArrayOrder() {
+        Observable<Integer> error = Observable.error(new RuntimeException());
+        Observable.ambArray(Observable.just(1), error).test().assertValue(1).assertComplete();
     }
 }

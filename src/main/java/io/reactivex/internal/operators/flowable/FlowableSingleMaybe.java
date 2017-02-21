@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,7 +13,7 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscription;
 
 import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
@@ -23,9 +23,9 @@ import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableSingleMaybe<T> extends Maybe<T> implements FuseToFlowable<T> {
 
-    final Publisher<T> source;
+    final Flowable<T> source;
 
-    public FlowableSingleMaybe(Publisher<T> source) {
+    public FlowableSingleMaybe(Flowable<T> source) {
         this.source = source;
     }
 
@@ -40,7 +40,7 @@ public final class FlowableSingleMaybe<T> extends Maybe<T> implements FuseToFlow
     }
 
     static final class SingleElementSubscriber<T>
-    implements Subscriber<T>, Disposable {
+    implements FlowableSubscriber<T>, Disposable {
 
         final MaybeObserver<? super T> actual;
 

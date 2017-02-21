@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -171,7 +171,7 @@ public class ObservableGroupByTest {
     /**
      * Assert that only a single subscription to a stream occurs and that all events are received.
      *
-     * @throws Throwable
+     * @throws Throwable some method may throw
      */
     @Test
     public void testGroupedEventStream() throws Throwable {
@@ -1448,10 +1448,10 @@ public class ObservableGroupByTest {
     @Test
     public void keySelectorAndDelayError() {
         Observable.just(1).concatWith(Observable.<Integer>error(new TestException()))
-        .groupBy(Functions.identity(), true)
-        .flatMap(new Function<GroupedObservable<Object, Integer>, ObservableSource<Integer>>() {
+        .groupBy(Functions.<Integer>identity(), true)
+        .flatMap(new Function<GroupedObservable<Integer, Integer>, ObservableSource<Integer>>() {
             @Override
-            public ObservableSource<Integer> apply(GroupedObservable<Object, Integer> g) throws Exception {
+            public ObservableSource<Integer> apply(GroupedObservable<Integer, Integer> g) throws Exception {
                 return g;
             }
         })
@@ -1462,10 +1462,10 @@ public class ObservableGroupByTest {
     @Test
     public void keyAndValueSelectorAndDelayError() {
         Observable.just(1).concatWith(Observable.<Integer>error(new TestException()))
-        .groupBy(Functions.identity(), Functions.<Integer>identity(), true)
-        .flatMap(new Function<GroupedObservable<Object, Integer>, ObservableSource<Integer>>() {
+        .groupBy(Functions.<Integer>identity(), Functions.<Integer>identity(), true)
+        .flatMap(new Function<GroupedObservable<Integer, Integer>, ObservableSource<Integer>>() {
             @Override
-            public ObservableSource<Integer> apply(GroupedObservable<Object, Integer> g) throws Exception {
+            public ObservableSource<Integer> apply(GroupedObservable<Integer, Integer> g) throws Exception {
                 return g;
             }
         })

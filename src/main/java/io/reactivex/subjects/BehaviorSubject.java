@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 
 package io.reactivex.subjects;
 
+import io.reactivex.annotations.CheckReturnValue;
 import java.lang.reflect.Array;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.*;
@@ -28,21 +29,21 @@ import io.reactivex.plugins.RxJavaPlugins;
  * Subject that emits the most recent item it has observed and all subsequent observed items to each subscribed
  * {@link Observer}.
  * <p>
- * <img width="640" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.BehaviorSubject.png" alt="">
+ * <img width="640" height="415" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.BehaviorSubject.png" alt="">
  * <p>
  * Example usage:
  * <p>
  * <pre> {@code
 
-  // observer will receive all events.
-  BehaviorSubject<Object> subject = BehaviorSubject.create("default");
+  // observer will receive all 4 events (including "default").
+  BehaviorSubject<Object> subject = BehaviorSubject.createDefault("default");
   subject.subscribe(observer);
   subject.onNext("one");
   subject.onNext("two");
   subject.onNext("three");
 
   // observer will receive the "one", "two" and "three" events, but not "zero"
-  BehaviorSubject<Object> subject = BehaviorSubject.create("default");
+  BehaviorSubject<Object> subject = BehaviorSubject.create();
   subject.onNext("zero");
   subject.onNext("one");
   subject.subscribe(observer);
@@ -50,14 +51,14 @@ import io.reactivex.plugins.RxJavaPlugins;
   subject.onNext("three");
 
   // observer will receive only onComplete
-  BehaviorSubject<Object> subject = BehaviorSubject.create("default");
+  BehaviorSubject<Object> subject = BehaviorSubject.create();
   subject.onNext("zero");
   subject.onNext("one");
   subject.onComplete();
   subject.subscribe(observer);
 
   // observer will receive only onError
-  BehaviorSubject<Object> subject = BehaviorSubject.create("default");
+  BehaviorSubject<Object> subject = BehaviorSubject.create();
   subject.onNext("zero");
   subject.onNext("one");
   subject.onError(new RuntimeException("error"));
@@ -96,6 +97,7 @@ public final class BehaviorSubject<T> extends Subject<T> {
      *            the type of item the Subject will emit
      * @return the constructed {@link BehaviorSubject}
      */
+    @CheckReturnValue
     public static <T> BehaviorSubject<T> create() {
         return new BehaviorSubject<T>();
     }
@@ -111,6 +113,7 @@ public final class BehaviorSubject<T> extends Subject<T> {
      *            {@link BehaviorSubject} has not yet observed any items from its source {@code Observable}
      * @return the constructed {@link BehaviorSubject}
      */
+    @CheckReturnValue
     public static <T> BehaviorSubject<T> createDefault(T defaultValue) {
         return new BehaviorSubject<T>(defaultValue);
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,11 +15,12 @@ package io.reactivex.internal.operators.flowable;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.internal.subscriptions.SubscriptionArbiter;
 
 public final class FlowableSwitchIfEmpty<T> extends AbstractFlowableWithUpstream<T, T> {
     final Publisher<? extends T> other;
-    public FlowableSwitchIfEmpty(Publisher<T> source, Publisher<? extends T> other) {
+    public FlowableSwitchIfEmpty(Flowable<T> source, Publisher<? extends T> other) {
         super(source);
         this.other = other;
     }
@@ -31,7 +32,7 @@ public final class FlowableSwitchIfEmpty<T> extends AbstractFlowableWithUpstream
         source.subscribe(parent);
     }
 
-    static final class SwitchIfEmptySubscriber<T> implements Subscriber<T> {
+    static final class SwitchIfEmptySubscriber<T> implements FlowableSubscriber<T> {
         final Subscriber<? super T> actual;
         final Publisher<? extends T> other;
         final SubscriptionArbiter arbiter;

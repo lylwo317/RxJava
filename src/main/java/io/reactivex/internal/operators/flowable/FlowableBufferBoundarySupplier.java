@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,16 +13,17 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import io.reactivex.internal.functions.ObjectHelper;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
-import io.reactivex.internal.disposables.*;
+import io.reactivex.internal.disposables.DisposableHelper;
+import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.queue.MpscLinkedQueue;
 import io.reactivex.internal.subscribers.QueueDrainSubscriber;
 import io.reactivex.internal.subscriptions.*;
@@ -35,7 +36,7 @@ extends AbstractFlowableWithUpstream<T, U> {
     final Callable<? extends Publisher<B>> boundarySupplier;
     final Callable<U> bufferSupplier;
 
-    public FlowableBufferBoundarySupplier(Publisher<T> source, Callable<? extends Publisher<B>> boundarySupplier, Callable<U> bufferSupplier) {
+    public FlowableBufferBoundarySupplier(Flowable<T> source, Callable<? extends Publisher<B>> boundarySupplier, Callable<U> bufferSupplier) {
         super(source);
         this.boundarySupplier = boundarySupplier;
         this.bufferSupplier = bufferSupplier;
@@ -47,7 +48,7 @@ extends AbstractFlowableWithUpstream<T, U> {
     }
 
     static final class BufferBoundarySupplierSubscriber<T, U extends Collection<? super T>, B>
-    extends QueueDrainSubscriber<T, U, U> implements Subscriber<T>, Subscription, Disposable {
+    extends QueueDrainSubscriber<T, U, U> implements FlowableSubscriber<T>, Subscription, Disposable {
 
         final Callable<U> bufferSupplier;
         final Callable<? extends Publisher<B>> boundarySupplier;

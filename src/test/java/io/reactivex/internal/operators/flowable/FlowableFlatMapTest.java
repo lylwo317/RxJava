@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package io.reactivex.internal.operators.flowable;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
@@ -896,5 +897,33 @@ public class FlowableFlatMapTest {
         .flatMap(Functions.justFunction(Flowable.fromCallable(Functions.justCallable(2))))
         .test()
         .assertResult(2);
+    }
+
+    @Test
+    public void noCrossBoundaryFusion() {
+        for (int i = 0; i < 500; i++) {
+            TestSubscriber<Object> ts = Flowable.merge(
+                    Flowable.just(1).observeOn(Schedulers.single()).map(new Function<Integer, Object>() {
+                        @Override
+                        public Object apply(Integer v) throws Exception {
+                            return Thread.currentThread().getName().substring(0, 4);
+                        }
+                    }),
+                    Flowable.just(1).observeOn(Schedulers.computation()).map(new Function<Integer, Object>() {
+                        @Override
+                        public Object apply(Integer v) throws Exception {
+                            return Thread.currentThread().getName().substring(0, 4);
+                        }
+                    })
+            )
+            .test()
+            .awaitDone(5, TimeUnit.SECONDS)
+            .assertValueCount(2);
+
+            List<Object> list = ts.values();
+
+            assertTrue(list.toString(), list.contains("RxSi"));
+            assertTrue(list.toString(), list.contains("RxCo"));
+        }
     }
 }

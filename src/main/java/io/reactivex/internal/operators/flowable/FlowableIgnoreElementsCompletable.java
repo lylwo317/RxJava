@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -23,9 +23,9 @@ import io.reactivex.plugins.RxJavaPlugins;
 
 public final class FlowableIgnoreElementsCompletable<T> extends Completable implements FuseToFlowable<T> {
 
-    final Publisher<T> source;
+    final Flowable<T> source;
 
-    public FlowableIgnoreElementsCompletable(Publisher<T> source) {
+    public FlowableIgnoreElementsCompletable(Flowable<T> source) {
         this.source = source;
     }
 
@@ -39,7 +39,7 @@ public final class FlowableIgnoreElementsCompletable<T> extends Completable impl
         return RxJavaPlugins.onAssembly(new FlowableIgnoreElements<T>(source));
     }
 
-    static final class IgnoreElementsSubscriber<T> implements Subscriber<T>, Disposable {
+    static final class IgnoreElementsSubscriber<T> implements FlowableSubscriber<T>, Disposable {
         final CompletableObserver actual;
 
         Subscription s;

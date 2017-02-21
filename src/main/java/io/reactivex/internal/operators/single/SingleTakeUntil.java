@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -127,7 +127,7 @@ public final class SingleTakeUntil<T, U> extends Single<T> {
 
     static final class TakeUntilOtherSubscriber
     extends AtomicReference<Subscription>
-    implements Subscriber<Object> {
+    implements FlowableSubscriber<Object> {
 
         private static final long serialVersionUID = 5170026210238877381L;
 
@@ -147,7 +147,7 @@ public final class SingleTakeUntil<T, U> extends Single<T> {
         @Override
         public void onNext(Object t) {
             if (SubscriptionHelper.cancel(this)) {
-                onComplete();
+                parent.otherError(new CancellationException());
             }
         }
 
@@ -158,7 +158,10 @@ public final class SingleTakeUntil<T, U> extends Single<T> {
 
         @Override
         public void onComplete() {
-            parent.otherError(new CancellationException());
+            if (get() != SubscriptionHelper.CANCELLED) {
+                lazySet(SubscriptionHelper.CANCELLED);
+                parent.otherError(new CancellationException());
+            }
         }
 
         public void dispose() {

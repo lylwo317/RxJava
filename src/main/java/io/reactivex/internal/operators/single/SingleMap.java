@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -30,30 +30,42 @@ public final class SingleMap<T, R> extends Single<R> {
 
     @Override
     protected void subscribeActual(final SingleObserver<? super R> t) {
-        source.subscribe(new SingleObserver<T>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                t.onSubscribe(d);
+        source.subscribe(new MapSingleObserver<T, R>(t, mapper));
+    }
+
+    static final class MapSingleObserver<T, R> implements SingleObserver<T> {
+
+        final SingleObserver<? super R> t;
+
+        final Function<? super T, ? extends R> mapper;
+
+        MapSingleObserver(SingleObserver<? super R> t, Function<? super T, ? extends R> mapper) {
+            this.t = t;
+            this.mapper = mapper;
+        }
+
+        @Override
+        public void onSubscribe(Disposable d) {
+            t.onSubscribe(d);
+        }
+
+        @Override
+        public void onSuccess(T value) {
+            R v;
+            try {
+                v = mapper.apply(value);
+            } catch (Throwable e) {
+                Exceptions.throwIfFatal(e);
+                onError(e);
+                return;
             }
 
-            @Override
-            public void onSuccess(T value) {
-                R v;
-                try {
-                    v = mapper.apply(value);
-                } catch (Throwable e) {
-                    Exceptions.throwIfFatal(e);
-                    onError(e);
-                    return;
-                }
+            t.onSuccess(v);
+        }
 
-                t.onSuccess(v);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                t.onError(e);
-            }
-        });
+        @Override
+        public void onError(Throwable e) {
+            t.onError(e);
+        }
     }
 }

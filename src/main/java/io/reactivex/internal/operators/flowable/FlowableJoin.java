@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.*;
@@ -40,7 +41,7 @@ public final class FlowableJoin<TLeft, TRight, TLeftEnd, TRightEnd, R> extends A
     final BiFunction<? super TLeft, ? super TRight, ? extends R> resultSelector;
 
     public FlowableJoin(
-            Publisher<TLeft> source,
+            Flowable<TLeft> source,
             Publisher<? extends TRight> other,
             Function<? super TLeft, ? extends Publisher<TLeftEnd>> leftEnd,
             Function<? super TRight, ? extends Publisher<TRightEnd>> rightEnd,

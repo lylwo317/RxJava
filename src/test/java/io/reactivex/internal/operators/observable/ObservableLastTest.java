@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -357,5 +357,23 @@ public class ObservableLastTest {
         .lastElement()
         .test()
         .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void errorLastOrErrorObservable() {
+        Observable.error(new TestException())
+        .lastOrError()
+        .toObservable()
+        .test()
+        .assertFailure(TestException.class);
+    }
+
+    @Test
+    public void emptyLastOrErrorObservable() {
+        Observable.empty()
+        .lastOrError()
+        .toObservable()
+        .test()
+        .assertFailure(NoSuchElementException.class);
     }
 }

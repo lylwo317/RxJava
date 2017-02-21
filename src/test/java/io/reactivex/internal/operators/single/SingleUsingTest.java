@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -121,7 +121,7 @@ public class SingleUsingTest {
             .test()
             .assertFailureAndMessage(TestException.class, "Mapper");
 
-            TestHelper.assertError(errors, 0, TestException.class, "Disposer");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Disposer");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -175,7 +175,7 @@ public class SingleUsingTest {
             Single.using(Functions.justCallable(Disposables.empty()), mapper, disposerThrows, false)
             .test()
             .assertResult(1);
-            TestHelper.assertError(errors, 0, TestException.class, "Disposer");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Disposer");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -212,7 +212,7 @@ public class SingleUsingTest {
             }, disposerThrows, false)
             .test()
             .assertFailure(TestException.class);
-            TestHelper.assertError(errors, 0, TestException.class, "Disposer");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Disposer");
         } finally {
             RxJavaPlugins.reset();
         }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,18 +13,18 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import io.reactivex.internal.functions.ObjectHelper;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.reactivestreams.*;
 
-import io.reactivex.Scheduler;
+import io.reactivex.*;
 import io.reactivex.Scheduler.Worker;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.Exceptions;
-import io.reactivex.internal.disposables.*;
+import io.reactivex.internal.disposables.DisposableHelper;
+import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.queue.MpscLinkedQueue;
 import io.reactivex.internal.subscribers.QueueDrainSubscriber;
 import io.reactivex.internal.subscriptions.*;
@@ -41,7 +41,7 @@ public final class FlowableBufferTimed<T, U extends Collection<? super T>> exten
     final int maxSize;
     final boolean restartTimerOnMaxSize;
 
-    public FlowableBufferTimed(Publisher<T> source, long timespan, long timeskip, TimeUnit unit, Scheduler scheduler, Callable<U> bufferSupplier, int maxSize,
+    public FlowableBufferTimed(Flowable<T> source, long timespan, long timeskip, TimeUnit unit, Scheduler scheduler, Callable<U> bufferSupplier, int maxSize,
             boolean restartTimerOnMaxSize) {
         super(source);
         this.timespan = timespan;
@@ -177,9 +177,9 @@ public final class FlowableBufferTimed<T, U extends Collection<? super T>> exten
 
         @Override
         public void cancel() {
-            DisposableHelper.dispose(timer);
-
             s.cancel();
+
+            DisposableHelper.dispose(timer);
         }
 
         @Override
@@ -333,9 +333,9 @@ public final class FlowableBufferTimed<T, U extends Collection<? super T>> exten
 
         @Override
         public void cancel() {
-            w.dispose();
             clear();
             s.cancel();
+            w.dispose();
         }
 
         void clear() {
@@ -497,17 +497,15 @@ public final class FlowableBufferTimed<T, U extends Collection<? super T>> exten
 
         @Override
         public void onError(Throwable t) {
-            w.dispose();
             synchronized (this) {
                 buffer = null;
             }
             actual.onError(t);
+            w.dispose();
         }
 
         @Override
         public void onComplete() {
-            w.dispose();
-
             U b;
             synchronized (this) {
                 b = buffer;
@@ -519,6 +517,8 @@ public final class FlowableBufferTimed<T, U extends Collection<? super T>> exten
             if (enter()) {
                 QueueDrainHelper.drainMaxLoop(queue, actual, false, this, this);
             }
+
+            w.dispose();
         }
 
         @Override
@@ -543,11 +543,11 @@ public final class FlowableBufferTimed<T, U extends Collection<? super T>> exten
 
         @Override
         public void dispose() {
-            w.dispose();
             synchronized (this) {
                 buffer = null;
             }
             s.cancel();
+            w.dispose();
         }
 
         @Override

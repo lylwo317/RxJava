@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import io.reactivex.annotations.NonNull;
 import org.junit.*;
 import org.mockito.InOrder;
 import org.reactivestreams.*;
@@ -557,7 +558,7 @@ public class FlowableReplayTest {
     /**
      * Specifically test interaction with a Scheduler with subscribeOn.
      *
-     * @throws Exception
+     * @throws Exception functional interfaces declare throws Exception
      */
     @SuppressWarnings("unchecked")
     @Test
@@ -619,7 +620,7 @@ public class FlowableReplayTest {
     /**
      * Specifically test interaction with a Scheduler with subscribeOn.
      *
-     * @throws Exception
+     * @throws Exception functional interfaces declare throws Exception
      */
     @SuppressWarnings("unchecked")
     @Test
@@ -708,14 +709,16 @@ public class FlowableReplayTest {
             this.mockDisposable = mockDisposable;
         }
 
+        @NonNull
         @Override
-        public Disposable schedule(Runnable action) {
+        public Disposable schedule(@NonNull Runnable action) {
             action.run();
             return mockDisposable; // this subscription is returned but discarded
         }
 
+        @NonNull
         @Override
-        public Disposable schedule(Runnable action, long delayTime, TimeUnit unit) {
+        public Disposable schedule(@NonNull Runnable action, long delayTime, @NonNull TimeUnit unit) {
             action.run();
             return mockDisposable;
         }
@@ -1440,7 +1443,7 @@ public class FlowableReplayTest {
             .test()
             .assertFailureAndMessage(TestException.class, "First");
 
-            TestHelper.assertError(errors, 0, TestException.class, "Second");
+            TestHelper.assertUndeliverable(errors, 0, TestException.class, "Second");
         } finally {
             RxJavaPlugins.reset();
         }
@@ -1708,4 +1711,24 @@ public class FlowableReplayTest {
         Assert.assertFalse(buf.hasError());
     }
 
+    @Test
+    public void delayedUpstreamOnSubscribe() {
+        final Subscriber<?>[] sub = { null };
+
+        new Flowable<Integer>() {
+            @Override
+            protected void subscribeActual(Subscriber<? super Integer> s) {
+                sub[0] = s;
+            }
+        }
+        .replay()
+        .connect()
+        .dispose();
+
+        BooleanSubscription bs = new BooleanSubscription();
+
+        sub[0].onSubscribe(bs);
+
+        assertTrue(bs.isCancelled());
+    }
 }

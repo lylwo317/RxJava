@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -171,7 +171,7 @@ public class FlowableGroupByTest {
     /**
      * Assert that only a single subscription to a stream occurs and that all events are received.
      *
-     * @throws Throwable
+     * @throws Throwable some method call is declared throws
      */
     @Test
     public void testGroupedEventStream() throws Throwable {
@@ -1638,10 +1638,10 @@ public class FlowableGroupByTest {
     @Test
     public void keySelectorAndDelayError() {
         Flowable.just(1).concatWith(Flowable.<Integer>error(new TestException()))
-        .groupBy(Functions.identity(), true)
-        .flatMap(new Function<GroupedFlowable<Object, Integer>, Flowable<Integer>>() {
+        .groupBy(Functions.<Integer>identity(), true)
+        .flatMap(new Function<GroupedFlowable<Integer, Integer>, Flowable<Integer>>() {
             @Override
-            public Flowable<Integer> apply(GroupedFlowable<Object, Integer> g) throws Exception {
+            public Flowable<Integer> apply(GroupedFlowable<Integer, Integer> g) throws Exception {
                 return g;
             }
         })
@@ -1652,10 +1652,10 @@ public class FlowableGroupByTest {
     @Test
     public void keyAndValueSelectorAndDelayError() {
         Flowable.just(1).concatWith(Flowable.<Integer>error(new TestException()))
-        .groupBy(Functions.identity(), Functions.<Integer>identity(), true)
-        .flatMap(new Function<GroupedFlowable<Object, Integer>, Flowable<Integer>>() {
+        .groupBy(Functions.<Integer>identity(), Functions.<Integer>identity(), true)
+        .flatMap(new Function<GroupedFlowable<Integer, Integer>, Flowable<Integer>>() {
             @Override
-            public Flowable<Integer> apply(GroupedFlowable<Object, Integer> g) throws Exception {
+            public Flowable<Integer> apply(GroupedFlowable<Integer, Integer> g) throws Exception {
                 return g;
             }
         })

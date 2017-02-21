@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package io.reactivex.internal.observers;
 
 import io.reactivex.Observer;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.plugins.RxJavaPlugins;
 
 /**
@@ -110,6 +111,7 @@ public class DeferredScalarDisposable<T> extends BasicIntQueueDisposable<T> {
         actual.onComplete();
     }
 
+    @Nullable
     @Override
     public final T poll() throws Exception {
         if (get() == FUSED_READY) {

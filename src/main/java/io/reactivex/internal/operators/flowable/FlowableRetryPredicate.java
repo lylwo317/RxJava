@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.Predicate;
 import io.reactivex.internal.subscriptions.SubscriptionArbiter;
@@ -24,7 +25,7 @@ import io.reactivex.internal.subscriptions.SubscriptionArbiter;
 public final class FlowableRetryPredicate<T> extends AbstractFlowableWithUpstream<T, T> {
     final Predicate<? super Throwable> predicate;
     final long count;
-    public FlowableRetryPredicate(Publisher<T> source,
+    public FlowableRetryPredicate(Flowable<T> source,
             long count,
             Predicate<? super Throwable> predicate) {
         super(source);
@@ -42,7 +43,7 @@ public final class FlowableRetryPredicate<T> extends AbstractFlowableWithUpstrea
     }
 
     // FIXME update to a fresh Rsc algorithm
-    static final class RepeatSubscriber<T> extends AtomicInteger implements Subscriber<T> {
+    static final class RepeatSubscriber<T> extends AtomicInteger implements FlowableSubscriber<T> {
 
         private static final long serialVersionUID = -7098360935104053232L;
 

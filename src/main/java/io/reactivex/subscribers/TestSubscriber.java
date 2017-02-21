@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.annotations.Experimental;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -39,7 +40,7 @@ import io.reactivex.observers.BaseTestConsumer;
  */
 public class TestSubscriber<T>
 extends BaseTestConsumer<T, TestSubscriber<T>>
-implements Subscriber<T>, Subscription, Disposable {
+implements FlowableSubscriber<T>, Subscription, Disposable {
     /** The actual subscriber to forward events to. */
     private final Subscriber<? super T> actual;
 
@@ -207,7 +208,7 @@ implements Subscriber<T>, Subscription, Disposable {
         values.add(t);
 
         if (t == null) {
-            errors.add(new NullPointerException("onNext received a null Subscription"));
+            errors.add(new NullPointerException("onNext received a null value"));
         }
 
         actual.onNext(t);
@@ -226,7 +227,7 @@ implements Subscriber<T>, Subscription, Disposable {
             errors.add(t);
 
             if (t == null) {
-                errors.add(new IllegalStateException("onError received a null Subscription"));
+                errors.add(new IllegalStateException("onError received a null Throwable"));
             }
 
             actual.onError(t);
@@ -419,7 +420,7 @@ implements Subscriber<T>, Subscription, Disposable {
     /**
      * A subscriber that ignores all events and does not report errors.
      */
-    enum EmptySubscriber implements Subscriber<Object> {
+    enum EmptySubscriber implements FlowableSubscriber<Object> {
         INSTANCE;
 
         @Override

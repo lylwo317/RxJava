@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,8 +15,9 @@ package io.reactivex.internal.operators.flowable;
 
 import java.util.concurrent.Callable;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscriber;
 
+import io.reactivex.Flowable;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.functions.ObjectHelper;
@@ -29,7 +30,7 @@ public final class FlowableMapNotification<T, R> extends AbstractFlowableWithUps
     final Callable<? extends R> onCompleteSupplier;
 
     public FlowableMapNotification(
-            Publisher<T> source,
+            Flowable<T> source,
             Function<? super T, ? extends R> onNextMapper,
             Function<? super Throwable, ? extends R> onErrorMapper,
             Callable<? extends R> onCompleteSupplier) {

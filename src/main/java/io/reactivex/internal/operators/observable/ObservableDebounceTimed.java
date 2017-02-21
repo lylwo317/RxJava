@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -101,8 +101,8 @@ public final class ObservableDebounceTimed<T> extends AbstractObservableWithUpst
                 return;
             }
             done = true;
-            DisposableHelper.dispose(timer);
             actual.onError(t);
+            worker.dispose();
         }
 
         @Override
@@ -119,22 +119,20 @@ public final class ObservableDebounceTimed<T> extends AbstractObservableWithUpst
                 if (de != null) {
                     de.run();
                 }
-                DisposableHelper.dispose(timer);
-                worker.dispose();
                 actual.onComplete();
+                worker.dispose();
             }
         }
 
         @Override
         public void dispose() {
-            DisposableHelper.dispose(timer);
-            worker.dispose();
             s.dispose();
+            worker.dispose();
         }
 
         @Override
         public boolean isDisposed() {
-            return timer.get() == DisposableHelper.DISPOSED;
+            return worker.isDisposed();
         }
 
         void emit(long idx, T t, DebounceEmitter<T> emitter) {

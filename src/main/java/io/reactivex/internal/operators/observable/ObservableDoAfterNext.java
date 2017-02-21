@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package io.reactivex.internal.operators.observable;
 
 import io.reactivex.*;
 import io.reactivex.annotations.Experimental;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.internal.observers.BasicFuseableObserver;
 
@@ -65,6 +66,7 @@ public final class ObservableDoAfterNext<T> extends AbstractObservableWithUpstre
             return transitiveBoundaryFusion(mode);
         }
 
+        @Nullable
         @Override
         public T poll() throws Exception {
             T v = qs.poll();

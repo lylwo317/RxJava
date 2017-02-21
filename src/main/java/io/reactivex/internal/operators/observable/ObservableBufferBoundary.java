@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,7 +13,6 @@
 
 package io.reactivex.internal.operators.observable;
 
-import io.reactivex.internal.functions.ObjectHelper;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,7 +23,8 @@ import io.reactivex.disposables.*;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.functions.Function;
 import io.reactivex.internal.disposables.DisposableHelper;
-import io.reactivex.internal.fuseable.SimpleQueue;
+import io.reactivex.internal.functions.ObjectHelper;
+import io.reactivex.internal.fuseable.SimplePlainQueue;
 import io.reactivex.internal.observers.QueueDrainObserver;
 import io.reactivex.internal.queue.MpscLinkedQueue;
 import io.reactivex.internal.util.QueueDrainHelper;
@@ -125,7 +125,7 @@ extends AbstractObservableWithUpstream<T, U> {
                 buffers.clear();
             }
 
-            SimpleQueue<U> q = queue;
+            SimplePlainQueue<U> q = queue;
             for (U u : list) {
                 q.offer(u);
             }

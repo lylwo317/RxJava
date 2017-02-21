@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.disposables.DisposableHelper;
+import io.reactivex.internal.util.BlockingHelper;
 import io.reactivex.plugins.RxJavaPlugins;
 
 /**
@@ -71,6 +72,7 @@ implements SingleObserver<T>, Future<T>, Disposable {
     @Override
     public T get() throws InterruptedException, ExecutionException {
         if (getCount() != 0) {
+            BlockingHelper.verifyNonBlocking();
             await();
         }
 
@@ -87,6 +89,7 @@ implements SingleObserver<T>, Future<T>, Disposable {
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (getCount() != 0) {
+            BlockingHelper.verifyNonBlocking();
             if (!await(timeout, unit)) {
                 throw new TimeoutException();
             }

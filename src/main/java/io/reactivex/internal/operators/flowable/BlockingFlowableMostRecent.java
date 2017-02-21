@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,8 +15,7 @@ package io.reactivex.internal.operators.flowable;
 
 import java.util.*;
 
-import org.reactivestreams.Publisher;
-
+import io.reactivex.Flowable;
 import io.reactivex.internal.util.*;
 import io.reactivex.subscribers.DefaultSubscriber;
 
@@ -24,17 +23,17 @@ import io.reactivex.subscribers.DefaultSubscriber;
  * Returns an Iterable that always returns the item most recently emitted by an Observable, or a
  * seed value if no item has yet been emitted.
  * <p>
- * <img width="640" src="https://github.com/ReactiveX/RxJava/wiki/images/rx-operators/B.mostRecent.png" alt="">
+ * <img width="640" height="490" src="https://github.com/ReactiveX/RxJava/wiki/images/rx-operators/B.mostRecent.png" alt="">
  *
  * @param <T> the value type
  */
 public final class BlockingFlowableMostRecent<T> implements Iterable<T> {
 
-    final Publisher<? extends T> source;
+    final Flowable<? extends T> source;
 
     final T initialValue;
 
-    public BlockingFlowableMostRecent(Publisher<? extends T> source, T initialValue) {
+    public BlockingFlowableMostRecent(Flowable<? extends T> source, T initialValue) {
         this.source = source;
         this.initialValue = initialValue;
     }

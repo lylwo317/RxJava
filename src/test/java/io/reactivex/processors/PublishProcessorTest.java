@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -14,10 +14,11 @@
 package io.reactivex.processors;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -30,7 +31,12 @@ import io.reactivex.functions.*;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subscribers.*;
 
-public class PublishProcessorTest {
+public class PublishProcessorTest extends FlowableProcessorTest<Object> {
+
+    @Override
+    protected FlowableProcessor<Object> create() {
+        return PublishProcessor.create();
+    }
 
     @Test
     public void testCompleted() {
@@ -538,7 +544,7 @@ public class PublishProcessorTest {
 
         TestSubscriber<Integer> ts = pp.test();
 
-        pp.subscribe(new Subscriber<Integer>() {
+        pp.subscribe(new FlowableSubscriber<Integer>() {
 
             @Override
             public void onSubscribe(Subscription s) {
@@ -615,27 +621,5 @@ public class PublishProcessorTest {
         }
     }
 
-    @Test
-    public void onNextNull() {
-        final PublishProcessor<Object> p = PublishProcessor.create();
 
-        p.onNext(null);
-
-        p.test()
-            .assertNoValues()
-            .assertError(NullPointerException.class)
-            .assertErrorMessage("onNext called with null. Null values are generally not allowed in 2.x operators and sources.");
-    }
-
-    @Test
-    public void onErrorNull() {
-        final PublishProcessor<Object> p = PublishProcessor.create();
-
-        p.onError(null);
-
-        p.test()
-            .assertNoValues()
-            .assertError(NullPointerException.class)
-            .assertErrorMessage("onError called with null. Null values are generally not allowed in 2.x operators and sources.");
-    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -577,7 +577,7 @@ public class FlowableRefCountTest {
         assertEquals(6, intervalSubscribed.get());
     }
 
-    private enum CancelledSubscriber implements Subscriber<Integer> {
+    private enum CancelledSubscriber implements FlowableSubscriber<Integer> {
         INSTANCE;
 
         @Override public void onSubscribe(Subscription s) {

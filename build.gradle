@@ -29,8 +29,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.1.0'
 
-    perfCompile 'org.openjdk.jmh:jmh-core:1.13'
-    perfCompile 'org.openjdk.jmh:jmh-generator-annprocess:1.13'
+    perfCompile 'org.openjdk.jmh:jmh-core:1.16'
+    perfCompile 'org.openjdk.jmh:jmh-generator-annprocess:1.16'
 
     testCompile 'org.reactivestreams:reactive-streams-tck:1.0.0'
     testCompile group: 'org.testng', name: 'testng', version: '6.9.10'
@@ -198,3 +198,26 @@ findbugsMain {
     }
 }
 */
+
+// from https://discuss.gradle.org/t/maven-publish-plugin-generated-pom-making-dependency-scope-runtime/7494/10
+
+publishing.publications.all {
+  pom.withXml {
+    asNode().dependencies.'*'.findAll() {
+      it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+        dep.name == it.artifactId.text()
+      }
+    }.each { it.scope*.value = 'compile'}
+
+    asNode().developers.'*'.findAll() {
+       it.id.text() == 'benjchristensen'
+    } .each {
+       it.id*.value = 'akarnokd'
+       it.name*.value = 'David Karnok'
+       it.email*.value = 'akarnokd@gmail.com'
+    }
+    
+    asNode().properties.nebula_Module_Owner*.value = 'akarnokd@gmail.com'
+    asNode().properties.nebula_Module_Email*.value = 'akarnokd@gmail.com'
+  }
+}

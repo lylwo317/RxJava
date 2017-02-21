@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -43,7 +43,7 @@ public final class MaybeDelaySubscriptionOtherPublisher<T, U> extends AbstractMa
         other.subscribe(new OtherSubscriber<T>(observer, source));
     }
 
-    static final class OtherSubscriber<T> implements Subscriber<Object>, Disposable {
+    static final class OtherSubscriber<T> implements FlowableSubscriber<Object>, Disposable {
         final DelayMaybeObserver<T> main;
 
         MaybeSource<T> source;

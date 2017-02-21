@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,9 +13,10 @@
 
 package io.reactivex.internal.operators.flowable;
 
-import org.reactivestreams.*;
+import org.reactivestreams.Subscriber;
 
-import io.reactivex.annotations.Experimental;
+import io.reactivex.Flowable;
+import io.reactivex.annotations.*;
 import io.reactivex.functions.Consumer;
 import io.reactivex.internal.fuseable.ConditionalSubscriber;
 import io.reactivex.internal.subscribers.*;
@@ -30,7 +31,7 @@ public final class FlowableDoAfterNext<T> extends AbstractFlowableWithUpstream<T
 
     final Consumer<? super T> onAfterNext;
 
-    public FlowableDoAfterNext(Publisher<T> source, Consumer<? super T> onAfterNext) {
+    public FlowableDoAfterNext(Flowable<T> source, Consumer<? super T> onAfterNext) {
         super(source);
         this.onAfterNext = onAfterNext;
     }
@@ -55,6 +56,9 @@ public final class FlowableDoAfterNext<T> extends AbstractFlowableWithUpstream<T
 
         @Override
         public void onNext(T t) {
+            if (done) {
+                return;
+            }
             actual.onNext(t);
 
             if (sourceMode == NONE) {
@@ -71,6 +75,7 @@ public final class FlowableDoAfterNext<T> extends AbstractFlowableWithUpstream<T
             return transitiveBoundaryFusion(mode);
         }
 
+        @Nullable
         @Override
         public T poll() throws Exception {
             T v = qs.poll();
@@ -119,6 +124,7 @@ public final class FlowableDoAfterNext<T> extends AbstractFlowableWithUpstream<T
             return transitiveBoundaryFusion(mode);
         }
 
+        @Nullable
         @Override
         public T poll() throws Exception {
             T v = qs.poll();

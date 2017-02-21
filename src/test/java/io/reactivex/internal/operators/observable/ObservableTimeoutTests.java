@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -450,7 +450,7 @@ public class ObservableTimeoutTests {
             .test()
             .assertResult(1);
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -476,9 +476,43 @@ public class ObservableTimeoutTests {
             .test()
             .assertResult(1);
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
+    }
+
+    @Test
+    public void timedTake() {
+        PublishSubject<Integer> ps = PublishSubject.create();
+
+        TestObserver<Integer> to = ps.timeout(1, TimeUnit.DAYS)
+        .take(1)
+        .test();
+
+        assertTrue(ps.hasObservers());
+
+        ps.onNext(1);
+
+        assertFalse(ps.hasObservers());
+
+        to.assertResult(1);
+    }
+
+    @Test
+    public void timedFallbackTake() {
+        PublishSubject<Integer> ps = PublishSubject.create();
+
+        TestObserver<Integer> to = ps.timeout(1, TimeUnit.DAYS, Observable.just(2))
+        .take(1)
+        .test();
+
+        assertTrue(ps.hasObservers());
+
+        ps.onNext(1);
+
+        assertFalse(ps.hasObservers());
+
+        to.assertResult(1);
     }
 }

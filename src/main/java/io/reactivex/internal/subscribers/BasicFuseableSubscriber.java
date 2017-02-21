@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package io.reactivex.internal.subscribers;
 
 import org.reactivestreams.*;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.exceptions.Exceptions;
 import io.reactivex.internal.fuseable.QueueSubscription;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
@@ -25,7 +26,7 @@ import io.reactivex.plugins.RxJavaPlugins;
  * @param <T> the upstream value type
  * @param <R> the downstream value type
  */
-public abstract class BasicFuseableSubscriber<T, R> implements Subscriber<T>, QueueSubscription<R> {
+public abstract class BasicFuseableSubscriber<T, R> implements FlowableSubscriber<T>, QueueSubscription<R> {
 
     /** The downstream subscriber. */
     protected final Subscriber<? super R> actual;

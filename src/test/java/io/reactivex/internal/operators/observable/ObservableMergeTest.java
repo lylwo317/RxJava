@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -772,7 +772,7 @@ public class ObservableMergeTest {
      * Thus, we must allow all Observables to be sent. The ScalarSynchronousObservable use case is an exception to this since
      * we can grab the value synchronously.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException if the await is interrupted
      */
     @Test(timeout = 5000)
     public void testBackpressureBothUpstreamAndDownstreamWithRegularObservables() throws InterruptedException {

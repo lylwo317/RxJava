@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -104,7 +104,7 @@ public final class MaybeDelayOtherPublisher<T, U> extends AbstractMaybeWithUpstr
 
     static final class OtherSubscriber<T> extends
     AtomicReference<Subscription>
-    implements Subscriber<Object> {
+    implements FlowableSubscriber<Object> {
 
         private static final long serialVersionUID = -1215060610805418006L;
 

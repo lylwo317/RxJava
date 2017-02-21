@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
 
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.internal.util.ExceptionHelper;
+import io.reactivex.internal.util.*;
 
 public abstract class BlockingBaseObserver<T> extends CountDownLatch
 implements Observer<T>, Disposable {
@@ -67,6 +67,7 @@ implements Observer<T>, Disposable {
     public final T blockingGet() {
         if (getCount() != 0) {
             try {
+                BlockingHelper.verifyNonBlocking();
                 await();
             } catch (InterruptedException ex) {
                 dispose();

@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
 
-import io.reactivex.Flowable;
+import io.reactivex.*;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.Function;
@@ -44,7 +44,7 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
 
     final boolean delayError;
 
-    public FlowablePublishMulticast(Publisher<T> source,
+    public FlowablePublishMulticast(Flowable<T> source,
             Function<? super Flowable<T>, ? extends Publisher<? extends R>> selector, int prefetch,
             boolean delayError) {
         super(source);
@@ -74,7 +74,7 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
         source.subscribe(mp);
     }
 
-    static final class OutputCanceller<R> implements Subscriber<R>, Subscription {
+    static final class OutputCanceller<R> implements FlowableSubscriber<R>, Subscription {
         final Subscriber<? super R> actual;
 
         final MulticastProcessor<?> processor;
@@ -124,7 +124,7 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
         }
     }
 
-    static final class MulticastProcessor<T> extends Flowable<T> implements Subscriber<T>, Disposable {
+    static final class MulticastProcessor<T> extends Flowable<T> implements FlowableSubscriber<T>, Disposable {
 
         @SuppressWarnings("rawtypes")
         static final MulticastSubscription[] EMPTY = new MulticastSubscription[0];
@@ -138,6 +138,8 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
 
         final int prefetch;
 
+        final int limit;
+
         final boolean delayError;
 
         final AtomicReference<Subscription> s;
@@ -149,9 +151,12 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
         volatile boolean done;
         Throwable error;
 
+        int consumed;
+
         @SuppressWarnings("unchecked")
         MulticastProcessor(int prefetch, boolean delayError) {
             this.prefetch = prefetch;
+            this.limit = prefetch - (prefetch >> 2); // request after 75% consumption
             this.delayError = delayError;
             this.wip = new AtomicInteger();
             this.s = new AtomicReference<Subscription>();
@@ -315,6 +320,10 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
 
             SimpleQueue<T> q = queue;
 
+            int upstreamConsumed = consumed;
+            int localLimit = limit;
+            boolean canRequest = sourceMode != QueueSubscription.SYNC;
+
             for (;;) {
                 MulticastSubscription<T>[] array = subscribers.get();
 
@@ -383,6 +392,11 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
                         }
 
                         e++;
+
+                        if (canRequest && ++upstreamConsumed == localLimit) {
+                            upstreamConsumed = 0;
+                            s.get().request(localLimit);
+                        }
                     }
 
                     if (e == r) {
@@ -417,6 +431,7 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
                     }
                 }
 
+                consumed = upstreamConsumed;
                 missed = wip.addAndGet(-missed);
                 if (missed == 0) {
                     break;
@@ -472,8 +487,10 @@ public final class FlowablePublishMulticast<T, R> extends AbstractFlowableWithUp
 
         @Override
         public void cancel() {
-            getAndSet(Long.MIN_VALUE);
-            parent.remove(this);
+            if (getAndSet(Long.MIN_VALUE) != Long.MIN_VALUE) {
+                parent.remove(this);
+                parent.drain(); // unblock the others
+            }
         }
 
         public boolean isCancelled() {

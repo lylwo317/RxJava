@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.disposables.DisposableHelper;
 import io.reactivex.internal.queue.SpscLinkedArrayQueue;
-import io.reactivex.internal.util.ExceptionHelper;
+import io.reactivex.internal.util.*;
 
 public final class BlockingObservableIterable<T> implements Iterable<T> {
     final ObservableSource<? extends T> source;
@@ -78,6 +78,7 @@ public final class BlockingObservableIterable<T> implements Iterable<T> {
                 }
                 if (empty) {
                     try {
+                        BlockingHelper.verifyNonBlocking();
                         lock.lock();
                         try {
                             while (!done && queue.isEmpty()) {

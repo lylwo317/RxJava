@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package io.reactivex.processors;
 
+import io.reactivex.annotations.CheckReturnValue;
 import java.util.concurrent.atomic.*;
 
 import org.reactivestreams.*;
@@ -25,7 +26,7 @@ import io.reactivex.plugins.RxJavaPlugins;
  * A Subject that multicasts events to Subscribers that are currently subscribed to it.
  *
  * <p>
- * <img width="640" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.PublishSubject.png" alt="">
+ * <img width="640" height="405" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.PublishSubject.png" alt="">
  *
  * <p>The subject does not coordinate backpressure for its subscribers and implements a weaker onSubscribe which
  * calls requests Long.MAX_VALUE from the incoming Subscriptions. This makes it possible to subscribe the PublishSubject
@@ -74,6 +75,7 @@ public final class PublishProcessor<T> extends FlowableProcessor<T> {
      * @param <T> the value type
      * @return the new PublishProcessor
      */
+    @CheckReturnValue
     public static <T> PublishProcessor<T> create() {
         return new PublishProcessor<T>();
     }

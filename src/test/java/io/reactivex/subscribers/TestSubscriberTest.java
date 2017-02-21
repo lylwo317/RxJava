@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -81,6 +81,64 @@ public class TestSubscriberTest {
         o.assertValues(1, 3);
         o.assertValueCount(2);
         o.assertTerminated();
+    }
+
+    @Test
+    public void assertNeverAtNotMatchingValue() {
+        Flowable<Integer> oi = Flowable.fromIterable(Arrays.asList(1, 2));
+        TestSubscriber<Integer> o = new TestSubscriber<Integer>();
+        oi.subscribe(o);
+
+        o.assertNever(3);
+        o.assertValueCount(2);
+        o.assertTerminated();
+    }
+
+    @Test
+    public void assertNeverAtMatchingValue() {
+        Flowable<Integer> oi = Flowable.fromIterable(Arrays.asList(1, 2));
+        TestSubscriber<Integer> o = new TestSubscriber<Integer>();
+        oi.subscribe(o);
+
+        o.assertValues(1, 2);
+
+        thrown.expect(AssertionError.class);
+
+        o.assertNever(2);
+        o.assertValueCount(2);
+        o.assertTerminated();
+    }
+
+    @Test
+    public void assertNeverAtMatchingPredicate() {
+        TestSubscriber<Integer> ts = new TestSubscriber<Integer>();
+
+        Flowable.just(1, 2).subscribe(ts);
+
+        ts.assertValues(1, 2);
+
+        thrown.expect(AssertionError.class);
+
+        ts.assertNever(new Predicate<Integer>() {
+            @Override
+            public boolean test(final Integer o) throws Exception {
+                return o == 1;
+            }
+        });
+    }
+
+    @Test
+    public void assertNeverAtNotMatchingPredicate() {
+        TestSubscriber<Integer> ts = new TestSubscriber<Integer>();
+
+        Flowable.just(2, 3).subscribe(ts);
+
+        ts.assertNever(new Predicate<Integer>() {
+            @Override
+            public boolean test(final Integer o) throws Exception {
+                return o == 1;
+            }
+        });
     }
 
     @Test
@@ -1481,7 +1539,7 @@ public class TestSubscriberTest {
 
     @Test
     public void completeDelegateThrows() {
-        TestSubscriber<Integer> ts = new TestSubscriber<Integer>(new Subscriber<Integer>() {
+        TestSubscriber<Integer> ts = new TestSubscriber<Integer>(new FlowableSubscriber<Integer>() {
 
             @Override
             public void onSubscribe(Subscription d) {
@@ -1517,7 +1575,7 @@ public class TestSubscriberTest {
 
     @Test
     public void errorDelegateThrows() {
-        TestSubscriber<Integer> ts = new TestSubscriber<Integer>(new Subscriber<Integer>() {
+        TestSubscriber<Integer> ts = new TestSubscriber<Integer>(new FlowableSubscriber<Integer>() {
 
             @Override
             public void onSubscribe(Subscription d) {

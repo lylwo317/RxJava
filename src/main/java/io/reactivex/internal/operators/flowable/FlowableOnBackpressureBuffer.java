@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,9 +17,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.reactivestreams.*;
 
+import io.reactivex.*;
+import io.reactivex.annotations.Nullable;
 import io.reactivex.exceptions.*;
 import io.reactivex.functions.Action;
-import io.reactivex.internal.fuseable.*;
+import io.reactivex.internal.fuseable.SimplePlainQueue;
 import io.reactivex.internal.queue.*;
 import io.reactivex.internal.subscriptions.*;
 import io.reactivex.internal.util.BackpressureHelper;
@@ -30,7 +32,7 @@ public final class FlowableOnBackpressureBuffer<T> extends AbstractFlowableWithU
     final boolean delayError;
     final Action onOverflow;
 
-    public FlowableOnBackpressureBuffer(Publisher<T> source, int bufferSize, boolean unbounded,
+    public FlowableOnBackpressureBuffer(Flowable<T> source, int bufferSize, boolean unbounded,
             boolean delayError, Action onOverflow) {
         super(source);
         this.bufferSize = bufferSize;
@@ -44,7 +46,7 @@ public final class FlowableOnBackpressureBuffer<T> extends AbstractFlowableWithU
         source.subscribe(new BackpressureBufferSubscriber<T>(s, bufferSize, unbounded, delayError, onOverflow));
     }
 
-    static final class BackpressureBufferSubscriber<T> extends BasicIntQueueSubscription<T> implements Subscriber<T> {
+    static final class BackpressureBufferSubscriber<T> extends BasicIntQueueSubscription<T> implements FlowableSubscriber<T> {
 
         private static final long serialVersionUID = -2514538129242366402L;
 
@@ -251,6 +253,7 @@ public final class FlowableOnBackpressureBuffer<T> extends AbstractFlowableWithU
             return NONE;
         }
 
+        @Nullable
         @Override
         public T poll() throws Exception {
             return queue.poll();

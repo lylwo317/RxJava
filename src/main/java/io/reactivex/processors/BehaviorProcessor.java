@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 
 package io.reactivex.processors;
 
+import io.reactivex.annotations.CheckReturnValue;
 import java.lang.reflect.Array;
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
@@ -30,7 +31,7 @@ import io.reactivex.plugins.RxJavaPlugins;
  * Processor that emits the most recent item it has observed and all subsequent observed items to each subscribed
  * {@link Subscriber}.
  * <p>
- * <img width="640" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.BehaviorProcessor.png" alt="">
+ * <img width="640" height="460" src="https://raw.github.com/wiki/ReactiveX/RxJava/images/rx-operators/S.BehaviorProcessor.png" alt="">
  * <p>
  * Example usage:
  * <p>
@@ -97,6 +98,7 @@ public final class BehaviorProcessor<T> extends FlowableProcessor<T> {
      *            the type of item the Subject will emit
      * @return the constructed {@link BehaviorProcessor}
      */
+    @CheckReturnValue
     public static <T> BehaviorProcessor<T> create() {
         return new BehaviorProcessor<T>();
     }
@@ -112,6 +114,7 @@ public final class BehaviorProcessor<T> extends FlowableProcessor<T> {
      *            {@link BehaviorProcessor} has not yet observed any items from its source {@code Observable}
      * @return the constructed {@link BehaviorProcessor}
      */
+    @CheckReturnValue
     public static <T> BehaviorProcessor<T> createDefault(T defaultValue) {
         ObjectHelper.requireNonNull(defaultValue, "defaultValue is null");
         return new BehaviorProcessor<T>(defaultValue);

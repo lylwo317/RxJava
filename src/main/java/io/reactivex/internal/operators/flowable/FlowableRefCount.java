@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.reactivestreams.*;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.disposables.*;
 import io.reactivex.flowables.ConnectableFlowable;
 import io.reactivex.functions.Consumer;
@@ -42,7 +43,7 @@ public final class FlowableRefCount<T> extends AbstractFlowableWithUpstream<T, T
 
     final class ConnectionSubscriber
     extends AtomicReference<Subscription>
-    implements Subscriber<T>, Subscription {
+    implements FlowableSubscriber<T>, Subscription {
 
         private static final long serialVersionUID = 152064694420235350L;
         final Subscriber<? super T> subscriber;

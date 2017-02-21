@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.reactivestreams.*;
 
+import io.reactivex.FlowableSubscriber;
 import io.reactivex.internal.subscriptions.SubscriptionHelper;
 import io.reactivex.internal.util.BackpressureHelper;
 
@@ -27,7 +28,7 @@ import io.reactivex.internal.util.BackpressureHelper;
  * @param <T> the input value type
  * @param <R> the output value type
  */
-public abstract class SinglePostCompleteSubscriber<T, R> extends AtomicLong implements Subscriber<T>, Subscription {
+public abstract class SinglePostCompleteSubscriber<T, R> extends AtomicLong implements FlowableSubscriber<T>, Subscription {
     private static final long serialVersionUID = 7917814472626990048L;
 
     /** The downstream consumer. */

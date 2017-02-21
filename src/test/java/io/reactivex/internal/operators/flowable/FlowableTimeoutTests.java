@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -451,7 +451,7 @@ public class FlowableTimeoutTests {
             .test()
             .assertResult(1);
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -477,10 +477,45 @@ public class FlowableTimeoutTests {
             .test()
             .assertResult(1);
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
+    }
+
+
+    @Test
+    public void timedTake() {
+        PublishProcessor<Integer> ps = PublishProcessor.create();
+
+        TestSubscriber<Integer> to = ps.timeout(1, TimeUnit.DAYS)
+        .take(1)
+        .test();
+
+        assertTrue(ps.hasSubscribers());
+
+        ps.onNext(1);
+
+        assertFalse(ps.hasSubscribers());
+
+        to.assertResult(1);
+    }
+
+    @Test
+    public void timedFallbackTake() {
+        PublishProcessor<Integer> ps = PublishProcessor.create();
+
+        TestSubscriber<Integer> to = ps.timeout(1, TimeUnit.DAYS, Flowable.just(2))
+        .take(1)
+        .test();
+
+        assertTrue(ps.hasSubscribers());
+
+        ps.onNext(1);
+
+        assertFalse(ps.hasSubscribers());
+
+        to.assertResult(1);
     }
 
 }

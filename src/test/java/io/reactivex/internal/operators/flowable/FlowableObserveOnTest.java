@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
 
+import io.reactivex.annotations.Nullable;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.reactivestreams.*;
@@ -1178,7 +1179,7 @@ public class FlowableObserveOnTest {
 
             to.assertResult();
 
-            TestHelper.assertError(errors, 0, TestException.class);
+            TestHelper.assertUndeliverable(errors, 0, TestException.class);
         } finally {
             RxJavaPlugins.reset();
         }
@@ -1305,7 +1306,7 @@ public class FlowableObserveOnTest {
         final CountDownLatch cdl = new CountDownLatch(1);
 
         us.observeOn(Schedulers.single())
-        .subscribe(new Subscriber<Integer>() {
+        .subscribe(new FlowableSubscriber<Integer>() {
             Subscription d;
             int count;
             @Override
@@ -1363,6 +1364,7 @@ public class FlowableObserveOnTest {
                         return false;
                     }
 
+                    @Nullable
                     @Override
                     public Integer poll() throws Exception {
                         throw new TestException();
@@ -1413,6 +1415,7 @@ public class FlowableObserveOnTest {
                         return false;
                     }
 
+                    @Nullable
                     @Override
                     public Integer poll() throws Exception {
                         throw new TestException();
@@ -1464,6 +1467,7 @@ public class FlowableObserveOnTest {
                         return false;
                     }
 
+                    @Nullable
                     @Override
                     public Integer poll() throws Exception {
                         throw new TestException();
@@ -1514,6 +1518,7 @@ public class FlowableObserveOnTest {
                         return false;
                     }
 
+                    @Nullable
                     @Override
                     public Integer poll() throws Exception {
                         throw new TestException();

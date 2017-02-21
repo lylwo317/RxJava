@@ -1,5 +1,5 @@
 /**
- * Copyright 2016 Netflix, Inc.
+ * Copyright (c) 2016-present, RxJava Contributors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
@@ -153,9 +153,9 @@ public class MaybeFromRunnableTest {
                 Thread.sleep(100);
             }
 
-            TestHelper.assertError(errors, 0, RuntimeException.class);
+            TestHelper.assertUndeliverable(errors, 0, RuntimeException.class);
 
-            assertTrue(errors.get(0).toString(), errors.get(0).getCause() instanceof InterruptedException);
+            assertTrue(errors.get(0).toString(), errors.get(0).getCause().getCause() instanceof InterruptedException);
         } finally {
             RxJavaPlugins.reset();
         }
